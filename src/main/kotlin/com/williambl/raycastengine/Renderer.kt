@@ -37,7 +37,7 @@ class Renderer() {
 
             //Length of ray from one side to next in map
             var deltaDistX = abs(1 / rayDirX)
-            var deltaDistY = abs(1 / rayDirX)
+            var deltaDistY = abs(1 / rayDirY)
             var perpWallDist: Double
 
             //Direction to go in x and y
