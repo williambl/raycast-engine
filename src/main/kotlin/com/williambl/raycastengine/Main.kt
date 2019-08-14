@@ -10,10 +10,16 @@ object Main {
 
     var window: Long = 0
     var world = World(arrayOf(
-            arrayOf(true, true, true, true),
-            arrayOf(true, false, false, true),
-            arrayOf(true, false, false, true),
-            arrayOf(true, true, true, true)
+            arrayOf(true, true, true, true, true, true, true, true, true, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, false, false, false, false, false, false, false, false, true),
+            arrayOf(true, true, true, true, true, true, true, true, true, true)
     ))
 
     var player = Player(2.0, 2.0)
