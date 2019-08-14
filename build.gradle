@@ -63,7 +63,6 @@ dependencies {
     compile "org.lwjgl:lwjgl-sse:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-tinyfd:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-vulkan:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-xxhash:${lwjglVersion}"
 
     runtime "org.lwjgl:lwjgl:${lwjglVersion}:${lwjglNatives}"
