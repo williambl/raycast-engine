@@ -37,7 +37,7 @@ object Main {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE)
 
-        window = glfwCreateWindow(500, 300, "Hello World!", NULL, NULL)
+        window = glfwCreateWindow(640, 480, "Hello World!", NULL, NULL)
         if (window == NULL) {
             throw RuntimeException("Failed to create the GLFW window")
         }
@@ -55,7 +55,7 @@ object Main {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        glOrtho(0.0, 500.0, 0.0, 300.0, 1.0, -1.0)
+        glOrtho(0.0, 640.0, 0.0, 480.0, 1.0, -1.0)
         glMatrixMode(GL_MODELVIEW)
 
         player.initKeyCallbacks()
