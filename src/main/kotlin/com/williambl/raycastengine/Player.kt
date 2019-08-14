@@ -6,7 +6,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(var x: Double, var y: Double, var dir: Pair<Double, Double>) {
+class Player(var x: Double, var y: Double) {
+
+    var plane = Pair(0.0, 0.66)
+    var dir = Pair(-1.0, 0.0)
 
     fun initKeyCallbacks() {
         glfwSetKeyCallback(Main.window, GLFWKeyCallback.create { window, key, scancode, action, mods ->
@@ -44,17 +47,17 @@ class Player(var x: Double, var y: Double, var dir: Pair<Double, Double>) {
         val dirX = dir.first * cos(rotSpeed) - dir.second * sin(rotSpeed)
         val dirY = dir.first * sin(rotSpeed) + dir.second * cos(rotSpeed)
         dir = Pair(dirX, dirY)
-        val planeX = Main.renderer.plane.first * cos(rotSpeed) - Main.renderer.plane.second * sin(rotSpeed)
-        val planeY = Main.renderer.plane.first * sin(rotSpeed) + Main.renderer.plane.second * cos(rotSpeed)
-        Main.renderer.plane = Pair(planeX, planeY)
+        val planeX = plane.first * cos(rotSpeed) - plane.second * sin(rotSpeed)
+        val planeY = plane.first * sin(rotSpeed) + plane.second * cos(rotSpeed)
+        plane = Pair(planeX, planeY)
     }
 
     fun right() {
         val dirX = dir.first * cos(-rotSpeed) - dir.second * sin(-rotSpeed)
         val dirY = dir.first * sin(-rotSpeed) + dir.second * cos(-rotSpeed)
         dir = Pair(dirX, dirY)
-        val planeX = Main.renderer.plane.first * cos(-rotSpeed) - Main.renderer.plane.second * sin(-rotSpeed)
-        val planeY = Main.renderer.plane.first * sin(-rotSpeed) + Main.renderer.plane.second * cos(-rotSpeed)
-        Main.renderer.plane = Pair(planeX, planeY)
+        val planeX = plane.first * cos(-rotSpeed) - plane.second * sin(-rotSpeed)
+        val planeY = plane.first * sin(-rotSpeed) + plane.second * cos(-rotSpeed)
+        plane = Pair(planeX, planeY)
     }
 }

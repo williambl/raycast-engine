@@ -16,7 +16,7 @@ object Main {
             arrayOf(true, true, true, true)
     ))
 
-    var player = Player(2.0, 2.0, Pair(1.0, 0.0))
+    var player = Player(2.0, 2.0)
     var renderer = Renderer()
 
     @JvmStatic

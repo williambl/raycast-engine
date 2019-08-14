@@ -8,7 +8,6 @@ import kotlin.math.abs
 
 class Renderer() {
 
-    var plane = Pair(0.0, 0.66)
 
     fun render(world: World, player: Player) {
         val widthB = BufferUtils.createIntBuffer(1)
@@ -25,8 +24,8 @@ class Renderer() {
         for (column in 0..width) {
             val cameraX = 2 * column / width.toDouble() - 1 // x-coord in camera space
 
-            val rayDirX = player.dir.first + plane.first * cameraX
-            val rayDirY = player.dir.second + plane.second * cameraX
+            val rayDirX = player.dir.first + player.plane.first * cameraX
+            val rayDirY = player.dir.second + player.plane.second * cameraX
 
             //What tile are we in?
             var mapX = player.x.toInt()
