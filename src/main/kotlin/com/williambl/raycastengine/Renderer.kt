@@ -2,9 +2,11 @@ package com.williambl.raycastengine
 
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
-import java.nio.IntBuffer
-import javax.swing.Spring.width
-import kotlin.math.*
+import org.lwjgl.opengl.GL11.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class Renderer() {
@@ -103,12 +105,24 @@ class Renderer() {
             val lineHeight = (height / perpWallDist).toInt()
 
             //calculate lowest and highest pixel to fill in current stripe
-            var drawStart = -lineHeight / 2 + height / 2
-            if (drawStart < 0) drawStart = 0
-            var drawEnd = lineHeight / 2 + height / 2
-            if (drawEnd >= height) drawEnd = height - 1
+            var bottom = (-lineHeight / 2 + height / 2)
+            if (bottom < 0) bottom = 0
+            var top = (lineHeight / 2 + height / 2)
+            if (top >= height) top = (height - 1)
 
             println("$lineHeight")
+
+            glPushMatrix()
+            glColor3f(0.0f, 1.0f, 1.0f)
+
+            glBegin(GL_QUADS)
+            glVertex2i(column, bottom)
+            glVertex2i(column+1, bottom)
+            glVertex2i(column+1, top)
+            glVertex2i(column, top)
+
+            glEnd()
+            glPopMatrix()
         }
     }
 }

@@ -4,7 +4,6 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
-import kotlin.system.exitProcess
 
 
 object Main {
@@ -47,19 +46,25 @@ object Main {
 
         GL.createCapabilities()
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0.0, 500.0, 0.0, 300.0, 1.0, -1.0)
+        glMatrixMode(GL_MODELVIEW)
 
         val loop = fun () {
             // Clear the framebuffer
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-            // Swap the color buffers
-            glfwSwapBuffers(window)
-            renderer.render(world, player)
+
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents()
-            glfwDestroyWindow(window)
-            exitProcess(0)
+
+            // Render the world
+            renderer.render(world, player)
+
+            // Swap the color buffers
+            glfwSwapBuffers(window)
         }
 
         while (true) {
