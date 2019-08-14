@@ -10,13 +10,13 @@ object Main {
 
     var window: Long = 0
     var world = World(arrayOf(
-            arrayOf(false, true, true, false),
-            arrayOf(true, false, false, false),
-            arrayOf(false, false, true, false),
-            arrayOf(false, false, false, false)
+            arrayOf(true, true, true, true),
+            arrayOf(true, false, false, true),
+            arrayOf(true, false, false, true),
+            arrayOf(true, true, true, true)
     ))
 
-    var player = Player(0.5, 0.5, 0.0)
+    var player = Player(2.0, 2.0, Pair(1.0, 0.0))
     var renderer = Renderer()
 
     @JvmStatic
@@ -65,7 +65,7 @@ object Main {
             // Render the world
             renderer.render(world, player)
 
-            println(player.x.toString() + ", " + player.y.toString())
+            println(player.x.toString() + ", " + player.y.toString() + ", " + player.dir.toString())
 
             // Swap the color buffers
             glfwSwapBuffers(window)

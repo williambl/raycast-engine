@@ -2,12 +2,11 @@ package com.williambl.raycastengine
 
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
-import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(var x: Double, var y: Double, var dir: Double) {
+class Player(var x: Double, var y: Double, var dir: Pair<Double, Double>) {
 
     fun initKeyCallbacks() {
         glfwSetKeyCallback(Main.window, GLFWKeyCallback.create { window, key, scancode, action, mods ->
@@ -26,7 +25,7 @@ class Player(var x: Double, var y: Double, var dir: Double) {
     val rotSpeed = 0.1
 
     fun forward() {
-        val moveVec = Pair(cos(dir * PI / 180)*moveSpeed, sin(dir * PI / 180)*moveSpeed)
+        val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
         if (!Main.world.map[(x+moveVec.first).toInt()][y.toInt()])
             x += moveVec.first
         if (!Main.world.map[x.toInt()][(y+moveVec.second).toInt()])
@@ -34,7 +33,7 @@ class Player(var x: Double, var y: Double, var dir: Double) {
     }
 
     fun backward() {
-        val moveVec = Pair(cos(dir * PI / 180)*moveSpeed, sin(dir * PI / 180)*moveSpeed)
+        val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
         if (!Main.world.map[(x-moveVec.first).toInt()][y.toInt()])
             x -= moveVec.first
         if (!Main.world.map[x.toInt()][(y-moveVec.second).toInt()])
@@ -42,10 +41,20 @@ class Player(var x: Double, var y: Double, var dir: Double) {
     }
 
     fun left() {
-        dir -= rotSpeed
+        val dirX = dir.first * cos(rotSpeed) - dir.second * sin(rotSpeed)
+        val dirY = dir.first * sin(rotSpeed) + dir.second * cos(rotSpeed)
+        dir = Pair(dirX, dirY)
+        val planeX = Main.renderer.plane.first * cos(rotSpeed) - Main.renderer.plane.second * sin(rotSpeed)
+        val planeY = Main.renderer.plane.first * sin(rotSpeed) + Main.renderer.plane.second * cos(rotSpeed)
+        Main.renderer.plane = Pair(planeX, planeY)
     }
 
     fun right() {
-        dir += rotSpeed
+        val dirX = dir.first * cos(-rotSpeed) - dir.second * sin(-rotSpeed)
+        val dirY = dir.first * sin(-rotSpeed) + dir.second * cos(-rotSpeed)
+        dir = Pair(dirX, dirY)
+        val planeX = Main.renderer.plane.first * cos(-rotSpeed) - Main.renderer.plane.second * sin(-rotSpeed)
+        val planeY = Main.renderer.plane.first * sin(-rotSpeed) + Main.renderer.plane.second * cos(-rotSpeed)
+        Main.renderer.plane = Pair(planeX, planeY)
     }
 }

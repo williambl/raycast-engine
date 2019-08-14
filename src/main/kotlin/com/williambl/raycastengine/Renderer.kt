@@ -3,10 +3,7 @@ package com.williambl.raycastengine
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
 
 
 class Renderer() {
@@ -28,8 +25,8 @@ class Renderer() {
         for (column in 0..width) {
             val cameraX = 2 * column / width.toDouble() - 1 // x-coord in camera space
 
-            val rayDirX = cos(player.dir * PI / 180) + plane.first*cos(-player.dir)-plane.second*sin(player.dir) * cameraX
-            val rayDirY = sin(player.dir * PI / 180) + plane.first*sin(player.dir)+plane.second*cos(-player.dir) * cameraX
+            val rayDirX = player.dir.first + plane.first * cameraX
+            val rayDirY = player.dir.second + plane.second * cameraX
 
             //What tile are we in?
             var mapX = player.x.toInt()
@@ -94,7 +91,8 @@ class Renderer() {
                 hit = try {
                     world.map[mapX][mapY]
                 } catch (e: ArrayIndexOutOfBoundsException) {
-                    true
+                    false
+                    break
                 }
             }
 
