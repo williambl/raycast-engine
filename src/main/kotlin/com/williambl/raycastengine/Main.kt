@@ -52,6 +52,8 @@ object Main {
         glOrtho(0.0, 500.0, 0.0, 300.0, 1.0, -1.0)
         glMatrixMode(GL_MODELVIEW)
 
+        player.initKeyCallbacks()
+
         val loop = fun () {
             // Clear the framebuffer
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -62,6 +64,8 @@ object Main {
 
             // Render the world
             renderer.render(world, player)
+
+            println(player.x.toString() + ", " + player.y.toString())
 
             // Swap the color buffers
             glfwSwapBuffers(window)

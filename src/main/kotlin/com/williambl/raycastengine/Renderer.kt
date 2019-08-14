@@ -110,7 +110,7 @@ class Renderer() {
             var top = (lineHeight / 2 + height / 2)
             if (top >= height) top = (height - 1)
 
-            println("$lineHeight")
+            //println("$lineHeight")
 
             glPushMatrix()
             glColor3f(0.0f, 1.0f * (lineHeight / height.toFloat()), 1.0f)
