@@ -29,17 +29,17 @@ class Player(var x: Double, var y: Double) {
 
     fun forward() {
         val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
-        if (!Main.world.map[(x+moveVec.first).toInt()][y.toInt()])
+        if (Main.world.map[(x+moveVec.first).toInt()][y.toInt()] == 0)
             x += moveVec.first
-        if (!Main.world.map[x.toInt()][(y+moveVec.second).toInt()])
+        if (Main.world.map[x.toInt()][(y+moveVec.second).toInt()] == 0)
             y += moveVec.second
     }
 
     fun backward() {
         val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
-        if (!Main.world.map[(x-moveVec.first).toInt()][y.toInt()])
+        if (Main.world.map[(x-moveVec.first).toInt()][y.toInt()] == 0)
             x -= moveVec.first
-        if (!Main.world.map[x.toInt()][(y-moveVec.second).toInt()])
+        if (Main.world.map[x.toInt()][(y-moveVec.second).toInt()] == 0)
             y -= moveVec.second
     }
 

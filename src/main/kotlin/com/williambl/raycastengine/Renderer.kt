@@ -44,7 +44,7 @@ class Renderer() {
             var stepX: Int
             var stepY: Int
 
-            var hit = false //was a wall hit?
+            var result = 0 //was a wall hit?
             var side = 0 //was the wall vertical or horizontal
 
             //Figure out the step direction and initial distance to a side
@@ -70,7 +70,7 @@ class Renderer() {
             }
 
             //Loop to find where the ray hits a wall
-            while(!hit) {
+            while(result == 0) {
 
                 //Jump to next square
                 if (sideDistX < sideDistY)
@@ -87,10 +87,10 @@ class Renderer() {
                 }
 
                 //Check if ray has hit a wall
-                hit = try {
+                result = try {
                     world.map[mapX][mapY]
                 } catch (e: ArrayIndexOutOfBoundsException) {
-                    false
+                    0
                     break
                 }
             }

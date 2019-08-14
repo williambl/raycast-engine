@@ -10,16 +10,16 @@ object Main {
 
     var window: Long = 0
     var world = World(arrayOf(
-            arrayOf(true, true, true, true, true, true, true, true, true, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, false, false, false, false, false, false, false, false, true),
-            arrayOf(true, true, true, true, true, true, true, true, true, true)
+            arrayOf(1, 2, 2, 2, 2, 2, 2, 2, 2, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 3, 3, 3, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 3, 0, 3, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            arrayOf(1, 2, 2, 2, 2, 2, 2, 2, 2, 1)
     ))
 
     var player = Player(2.0, 2.0)
