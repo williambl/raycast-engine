@@ -113,7 +113,7 @@ class Renderer() {
             println("$lineHeight")
 
             glPushMatrix()
-            glColor3f(0.0f, 1.0f, 1.0f)
+            glColor3f(0.0f, 1.0f * (lineHeight / height.toFloat()), 1.0f)
 
             glBegin(GL_QUADS)
             glVertex2i(column, bottom)
