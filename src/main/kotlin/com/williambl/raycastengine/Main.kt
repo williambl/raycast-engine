@@ -4,9 +4,22 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
+import kotlin.system.exitProcess
 
 
 object Main {
+
+    var window: Long = 0
+    var world = World(arrayOf(
+            arrayOf(false, true, true, false),
+            arrayOf(true, false, false, false),
+            arrayOf(false, false, true, false),
+            arrayOf(false, false, false, false)
+    ))
+
+    var player = Player(0.5, 0.5, 0.0)
+    var renderer = Renderer()
+
     @JvmStatic
     fun main(args: Array<String>) {
         // Initialize GLFW. Most GLFW functions will not work before doing this.
@@ -19,7 +32,7 @@ object Main {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE)
 
-        val window = glfwCreateWindow(500, 300, "Hello World!", NULL, NULL)
+        window = glfwCreateWindow(500, 300, "Hello World!", NULL, NULL)
         if (window == NULL) {
             throw RuntimeException("Failed to create the GLFW window")
         }
@@ -41,9 +54,12 @@ object Main {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
             // Swap the color buffers
             glfwSwapBuffers(window)
+            renderer.render(world, player)
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents()
+            glfwDestroyWindow(window)
+            exitProcess(0)
         }
 
         while (true) {
