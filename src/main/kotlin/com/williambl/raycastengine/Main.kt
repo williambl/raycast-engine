@@ -12,6 +12,7 @@ object Main {
     var windowHeight: Int = 480
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
+
     var world = World(arrayOf(
             arrayOf(1, 2, 2, 2, 2, 2, 2, 2, 2, 1),
             arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
@@ -28,6 +29,13 @@ object Main {
     var player = Player(2.0, 2.0)
     var renderer = Renderer()
 
+    var tickables: Array<Tickable> = arrayOf(
+            renderer
+    )
+    var inputListeners: Array<InputListener> = arrayOf(
+            player
+    )
+
     @JvmStatic
     fun main(args: Array<String>) {
         init()
@@ -41,7 +49,7 @@ object Main {
         initGLFW()
         initOGL()
 
-        player.initKeyCallbacks()
+        initInputListeners()
     }
 
     fun initGLFW() {
@@ -79,6 +87,18 @@ object Main {
         glMatrixMode(GL_MODELVIEW)
     }
 
+    fun initInputListeners() {
+        inputListeners.forEach {
+            it.attachInputCallbacks()
+        }
+    }
+
+    fun tickTickables() {
+        tickables.forEach {
+            it.tick()
+        }
+    }
+
     fun loop() {
         // Clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -87,10 +107,7 @@ object Main {
         // invoked during this call.
         glfwPollEvents()
 
-        // Render the world
-        renderer.render(world, player)
-
-        println(player.x.toString() + ", " + player.y.toString() + ", " + player.dir.toString())
+        tickTickables()
 
         // Swap the color buffers
         glfwSwapBuffers(window)

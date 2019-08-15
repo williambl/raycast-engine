@@ -6,8 +6,12 @@ import org.lwjgl.opengl.GL11.*
 import kotlin.math.abs
 
 
-class Renderer() {
+class Renderer(): Tickable {
 
+
+    override fun tick() {
+        render(Main.world, Main.player)
+    }
 
     fun render(world: World, player: Player) {
         val widthB = BufferUtils.createIntBuffer(1)

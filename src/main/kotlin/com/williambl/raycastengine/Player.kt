@@ -6,12 +6,12 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(var x: Double, var y: Double) {
+class Player(var x: Double, var y: Double): InputListener {
 
     var plane = Pair(0.0, 0.66)
     var dir = Pair(-1.0, 0.0)
 
-    fun initKeyCallbacks() {
+    override fun attachInputCallbacks() {
         glfwSetKeyCallback(Main.window, GLFWKeyCallback.create { window, key, scancode, action, mods ->
             if (key == GLFW_KEY_W)
                 forward()
