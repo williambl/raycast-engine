@@ -132,10 +132,8 @@ class Renderer(): Tickable {
             val lineHeight = (height / perpWallDist).toInt()
 
             //calculate lowest and highest pixel to fill in current stripe
-            var bottom = (-lineHeight / 2 + height / 2)
-            if (bottom < 0) bottom = 0
-            var top = (lineHeight / 2 + height / 2)
-            if (top >= height) top = (height - 1)
+            val bottom = (-lineHeight / 2 + height / 2)
+            val top = (lineHeight / 2 + height / 2)
 
             //calculate which column of texture to use
             var wallX = if (side == 0) player.y + perpWallDist * rayDirY
