@@ -8,10 +8,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(var x: Double, var y: Double): InputListener {
-
-    var plane = Pair(0.0, 0.66)
-    var dir = Pair(-1.0, 0.0)
+class Player(x: Double, y: Double) : Camera(x, y), InputListener {
 
     override fun attachInputCallbacks() {
         glfwSetKeyCallback(Main.window, GLFWKeyCallback.create { window, key, scancode, action, mods ->

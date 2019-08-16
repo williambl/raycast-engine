@@ -3,7 +3,7 @@ package com.williambl.raycastengine.render
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.World
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.gameobject.Player
+import com.williambl.raycastengine.gameobject.Camera
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
@@ -19,7 +19,7 @@ class Renderer : Tickable {
         render(Main.world, Main.player)
     }
 
-    private fun render(world: World, player: Player) {
+    private fun render(world: World, camera: Camera) {
         val widthB = BufferUtils.createIntBuffer(1)
         val heightB = BufferUtils.createIntBuffer(1)
         glfwGetWindowSize(Main.window, widthB, heightB)
@@ -28,7 +28,7 @@ class Renderer : Tickable {
 
         renderBackground(width, height)
 
-        renderWorld(world, player, width, height)
+        renderWorld(world, camera, width, height)
     }
 
     private fun renderBackground(width: Int, height: Int) {
@@ -53,16 +53,16 @@ class Renderer : Tickable {
 
     }
 
-    private fun renderWorld(world: World, player: Player, width: Int, height: Int) {
+    private fun renderWorld(world: World, camera: Camera, width: Int, height: Int) {
         for (column in 0..width) {
             val cameraX = 2 * column / width.toDouble() - 1 // X-coord in camera space
 
-            val rayDirX = player.dir.first + player.plane.first * cameraX
-            val rayDirY = player.dir.second + player.plane.second * cameraX
+            val rayDirX = camera.dir.first + camera.plane.first * cameraX
+            val rayDirY = camera.dir.second + camera.plane.second * cameraX
 
             // Coords of current square
-            var mapX = player.x.toInt()
-            var mapY = player.y.toInt()
+            var mapX = camera.x.toInt()
+            var mapY = camera.y.toInt()
 
             // Length of ray from current position to next X or Y wall
             // https://lodev.org/cgtutor/images/raycastdelta.gif
@@ -85,22 +85,22 @@ class Renderer : Tickable {
             if (rayDirX < 0)
             {
                 stepX = -1
-                sideDistX = (player.x - mapX) * deltaDistX
+                sideDistX = (camera.x - mapX) * deltaDistX
             }
             else
             {
                 stepX = 1
-                sideDistX = (mapX + 1.0 - player.x) * deltaDistX
+                sideDistX = (mapX + 1.0 - camera.x) * deltaDistX
             }
             if (rayDirY < 0)
             {
                 stepY = -1
-                sideDistY = (player.y - mapY) * deltaDistY
+                sideDistY = (camera.y - mapY) * deltaDistY
             }
             else
             {
                 stepY = 1
-                sideDistY = (mapY + 1.0 - player.y) * deltaDistY
+                sideDistY = (mapY + 1.0 - camera.y) * deltaDistY
             }
 
             // Loop to find where the ray hits a wall
@@ -130,8 +130,8 @@ class Renderer : Tickable {
             }
 
             // Calculate distance from camera plane to wall
-            perpWallDist = if (side == 0) (mapX - player.x + (1 - stepX) / 2) / rayDirX
-            else (mapY - player.y + (1 - stepY) / 2) / rayDirY
+            perpWallDist = if (side == 0) (mapX - camera.x + (1 - stepX) / 2) / rayDirX
+            else (mapY - camera.y + (1 - stepY) / 2) / rayDirY
 
             val lineHeight = (height / perpWallDist).toInt()
 
@@ -140,8 +140,8 @@ class Renderer : Tickable {
             val top = (lineHeight / 2 + height / 2)
 
             // Calculate which column of texture to use
-            var textureX = if (side == 0) player.y + perpWallDist * rayDirY
-            else player.x + perpWallDist * rayDirX
+            var textureX = if (side == 0) camera.y + perpWallDist * rayDirY
+            else camera.x + perpWallDist * rayDirX
             textureX -= floor((textureX))
 
             val pixelWidth = 1/world.wallTextures[result].width
@@ -152,9 +152,9 @@ class Renderer : Tickable {
             var brightnessG = 0.0
             var brightnessB = 0.0
             world.lights.forEach {
-                brightnessR += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.first
-                brightnessG += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.second
-                brightnessB += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.third
+                brightnessR += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.first
+                brightnessG += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.second
+                brightnessB += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.third
             }
 
             brightnessR = min(brightnessR, 1.0) // No HDR for you
