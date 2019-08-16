@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.render
 
 import de.matthiasmann.twl.utils.PNGDecoder
 import org.lwjgl.opengl.GL11.*

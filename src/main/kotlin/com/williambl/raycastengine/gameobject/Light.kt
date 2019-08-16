@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.gameobject
 
 class Light(var x: Double, var y: Double, var strength: Triple<Double, Double, Double>) {
 

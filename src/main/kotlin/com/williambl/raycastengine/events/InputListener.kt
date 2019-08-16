@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.events
 
 interface InputListener {
     fun attachInputCallbacks()

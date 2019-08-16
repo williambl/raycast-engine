@@ -1,5 +1,7 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.gameobject
 
+import com.williambl.raycastengine.Main
+import com.williambl.raycastengine.events.InputListener
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
 import kotlin.math.cos

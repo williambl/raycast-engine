@@ -1,5 +1,9 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.render
 
+import com.williambl.raycastengine.Main
+import com.williambl.raycastengine.World
+import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.Player
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
