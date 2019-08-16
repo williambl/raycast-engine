@@ -19,10 +19,36 @@ class Renderer(): Tickable {
         glfwGetWindowSize(Main.window, widthB, heightB)
         val width = widthB[0]
         val height = heightB[0]
-        println(width)
-        println(height)
-        println()
-        println()
+
+        renderBackground(width, height)
+
+        renderWorld(world, player, width, height)
+    }
+
+    fun renderBackground(width: Int, height: Int) {
+
+        glPushMatrix()
+        glDisable(GL_TEXTURE_2D)
+        glColor3d(0.6, 0.6, 0.6)
+        glBegin(GL_QUADS)
+        glVertex2i(0, 0)
+        glVertex2i(width, 0)
+        glVertex2i(width, height/2)
+        glVertex2i(0, height/2)
+        glEnd()
+
+        glColor3d(0.1, 0.1, 0.1)
+        glVertex2i(0, height/2)
+        glVertex2i(width, height/2)
+        glVertex2i(width, height)
+        glVertex2i(0, height)
+        glEnd()
+
+        glPopMatrix()
+
+    }
+
+    fun renderWorld(world: World, player: Player, width: Int, height: Int) {
 
 
         for (column in 0..width) {
@@ -113,7 +139,7 @@ class Renderer(): Tickable {
 
             //calculate which column of texture to use
             var wallX = if (side == 0) player.y + perpWallDist * rayDirY
-                        else           player.x + perpWallDist * rayDirX
+            else           player.x + perpWallDist * rayDirX
             wallX -= floor((wallX))
 
             val pixelWidth = 1/world.wallTextures[result].width
@@ -121,6 +147,7 @@ class Renderer(): Tickable {
             //println("$lineHeight")
 
             glPushMatrix()
+            glColor3d(1.0, 1.0, 1.0)
             glEnable(GL_TEXTURE_2D)
             world.wallTextures[result].bind()
 
