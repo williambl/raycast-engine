@@ -210,6 +210,10 @@ class Renderer : Tickable {
 
             glPushMatrix()
             glColor3d(brightness.first, brightness.second, brightness.third)
+
+            glAlphaFunc(GL_GREATER, 0.5f)
+            glEnable(GL_ALPHA_TEST)
+
             glEnable(GL_TEXTURE_2D)
             it.texture.bind()
 
