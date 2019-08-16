@@ -1,11 +1,15 @@
 package com.williambl.raycastengine
 
 
-class World(val map: Array<Array<Int>>) {
+class World(val map: Array<Array<Int>>): StartupListener {
 
-    val wallTextures = arrayOf(
-            Texture(""),
-            Texture("brick.png"),
-            Texture("stone.png")
-    )
+    lateinit var wallTextures: Array<Texture>
+
+    override fun onStart() {
+        wallTextures = arrayOf(
+                Texture(""),
+                Texture("/brick.png"),
+                Texture("stone.png")
+        )
+    }
 }

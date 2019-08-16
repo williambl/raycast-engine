@@ -35,6 +35,9 @@ object Main {
     var inputListeners: Array<InputListener> = arrayOf(
             player
     )
+    var startupListeners: Array<StartupListener> = arrayOf(
+            world
+    )
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -50,6 +53,7 @@ object Main {
         initOGL()
 
         initInputListeners()
+        initStartupListeners()
     }
 
     fun initGLFW() {
@@ -90,6 +94,12 @@ object Main {
     fun initInputListeners() {
         inputListeners.forEach {
             it.attachInputCallbacks()
+        }
+    }
+
+    fun initStartupListeners() {
+        startupListeners.forEach {
+            it.onStart()
         }
     }
 
