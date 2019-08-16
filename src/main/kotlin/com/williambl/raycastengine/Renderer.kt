@@ -146,7 +146,7 @@ class Renderer : Tickable {
 
             var brightness = 0.0
             world.lights.forEach {
-                brightness += (1 / (abs(it.x - mapX).pow(2) + abs(it.y - mapY).pow(2))) * it.strength
+                brightness += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength
             }
 
             brightness = min(brightness, 1.0) // No HDR for you
