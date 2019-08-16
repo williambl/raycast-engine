@@ -5,6 +5,8 @@ import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
 import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.math.min
+import kotlin.math.pow
 
 
 class Renderer : Tickable {
@@ -140,10 +142,19 @@ class Renderer : Tickable {
 
             val pixelWidth = 1/world.wallTextures[result].width
 
+            // Work out how light it should be
+
+            var brightness = 0.0
+            world.lights.forEach {
+                brightness += (1 / (abs(it.x - mapX).pow(2) + abs(it.y - mapY).pow(2))) * it.strength
+            }
+
+            brightness = min(brightness, 1.0) // No HDR for you
+
             // Draw it
 
             glPushMatrix()
-            glColor3d(1.0, 1.0, 1.0)
+            glColor3d(brightness, brightness, brightness)
             glEnable(GL_TEXTURE_2D)
             world.wallTextures[result].bind()
 
