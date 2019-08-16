@@ -152,18 +152,7 @@ class Renderer : Tickable {
 
             // Work out how light it should be
 
-            var brightnessR = 0.0
-            var brightnessG = 0.0
-            var brightnessB = 0.0
-            world.lights.forEach {
-                brightnessR += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.first
-                brightnessG += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.second
-                brightnessB += (1 / (abs(it.x - (camera.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (camera.y + perpWallDist * rayDirY)).pow(2))) * it.strength.third
-            }
-
-            brightnessR = min(brightnessR, 1.0) // No HDR for you
-            brightnessG = min(brightnessG, 1.0) // No HDR for you
-            brightnessB = min(brightnessB, 1.0) // No HDR for you
+            val brightness = calculateLighting(world, (camera.x + perpWallDist * rayDirX), (camera.y + perpWallDist * rayDirY))
 
             // Write to the z-buffer
             zBuffer[column] = perpWallDist
@@ -171,7 +160,7 @@ class Renderer : Tickable {
             // Draw it
 
             glPushMatrix()
-            glColor3d(brightnessR, brightnessG, brightnessB)
+            glColor3d(brightness.first, brightness.second, brightness.third)
             glEnable(GL_TEXTURE_2D)
             world.wallTextures[result].bind()
 
@@ -217,8 +206,10 @@ class Renderer : Tickable {
             val spriteHeight = (height / spriteDepth).toInt()
             val spriteWidth = spriteHeight * (it.texture.width / it.texture.height)
 
+            val brightness = calculateLighting(world, it.x, it.y)
+
             glPushMatrix()
-            glColor3d(1.0, 1.0, 1.0)
+            glColor3d(brightness.first, brightness.second, brightness.third)
             glEnable(GL_TEXTURE_2D)
             it.texture.bind()
 
@@ -231,5 +222,23 @@ class Renderer : Tickable {
             glEnd()
             glPopMatrix()
         }
+    }
+
+    private fun calculateLighting(world: World, x: Double, y: Double): Triple<Double, Double, Double> {
+        var brightnessR = 0.0
+        var brightnessG = 0.0
+        var brightnessB = 0.0
+        world.lights.forEach {
+            brightnessR += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.first
+            brightnessG += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.second
+            brightnessB += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.third
+        }
+
+        // No HDR for you
+        brightnessR = min(brightnessR, 1.0)
+        brightnessG = min(brightnessG, 1.0)
+        brightnessB = min(brightnessB, 1.0)
+
+        return Triple(brightnessR, brightnessG, brightnessB)
     }
 }
