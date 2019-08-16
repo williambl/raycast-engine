@@ -4,6 +4,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
 import kotlin.math.abs
+import kotlin.math.floor
 
 
 class Renderer(): Tickable {
@@ -110,6 +111,13 @@ class Renderer(): Tickable {
             var top = (lineHeight / 2 + height / 2)
             if (top >= height) top = (height - 1)
 
+            //calculate which column of texture to use
+            var wallX = if (side == 0) player.y + perpWallDist * rayDirY
+                        else           player.x + perpWallDist * rayDirX
+            wallX -= floor((wallX))
+
+            val pixelWidth = 1/world.wallTextures[result].width
+
             //println("$lineHeight")
 
             glPushMatrix()
@@ -117,10 +125,10 @@ class Renderer(): Tickable {
             world.wallTextures[result].bind()
 
             glBegin(GL_QUADS)
-            glTexCoord2d(0.0, 0.0); glVertex2i(column, bottom)
-            glTexCoord2d(1.0, 0.0); glVertex2i(column+1, bottom)
-            glTexCoord2d(1.0, 1.0); glVertex2i(column+1, top)
-            glTexCoord2d(0.0, 1.0); glVertex2i(column, top)
+            glTexCoord2d(wallX, 0.0); glVertex2i(column, bottom)
+            glTexCoord2d(wallX+pixelWidth, 0.0); glVertex2i(column+1, bottom)
+            glTexCoord2d(wallX+pixelWidth, 1.0); glVertex2i(column+1, top)
+            glTexCoord2d(wallX, 1.0); glVertex2i(column, top)
 
             glEnd()
             glPopMatrix()
