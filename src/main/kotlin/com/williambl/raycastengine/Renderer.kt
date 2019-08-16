@@ -125,10 +125,10 @@ class Renderer(): Tickable {
             world.wallTextures[result].bind()
 
             glBegin(GL_QUADS)
-            glTexCoord2d(wallX, 0.0); glVertex2i(column, bottom)
-            glTexCoord2d(wallX+pixelWidth, 0.0); glVertex2i(column+1, bottom)
-            glTexCoord2d(wallX+pixelWidth, 1.0); glVertex2i(column+1, top)
-            glTexCoord2d(wallX, 1.0); glVertex2i(column, top)
+            glTexCoord2d(wallX, 1.0); glVertex2i(column, bottom)
+            glTexCoord2d(wallX+pixelWidth, 1.0); glVertex2i(column+1, bottom)
+            glTexCoord2d(wallX+pixelWidth, 0.0); glVertex2i(column+1, top)
+            glTexCoord2d(wallX, 0.0); glVertex2i(column, top)
 
             glEnd()
             glPopMatrix()
