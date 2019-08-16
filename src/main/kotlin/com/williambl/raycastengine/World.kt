@@ -9,7 +9,7 @@ class World(val map: Array<Array<Int>>): StartupListener {
         wallTextures = arrayOf(
                 Texture(""),
                 Texture("/brick.png"),
-                Texture("stone.png")
+                Texture("/stone.png")
         )
     }
 }
