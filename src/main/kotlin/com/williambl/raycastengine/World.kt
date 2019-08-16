@@ -2,6 +2,7 @@ package com.williambl.raycastengine
 
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.gameobject.Light
+import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.render.Texture
 
 
@@ -10,6 +11,8 @@ class World(val map: Array<Array<Int>>): StartupListener {
     lateinit var wallTextures: Array<Texture>
 
     var lights: ArrayList<Light> = arrayListOf()
+
+    var sprites: ArrayList<Sprite> = arrayListOf()
 
     override fun onStart() {
         wallTextures = arrayOf(
@@ -20,5 +23,7 @@ class World(val map: Array<Array<Int>>): StartupListener {
 
         lights.add(Light(2.0, 2.0, Triple(5.0, 3.0, 0.0)))
         lights.add(Light(7.0, 8.0, 5.0))
+
+        sprites.add(Sprite(Texture("/face.png"), 3.0, 3.0))
     }
 }

@@ -26,9 +26,13 @@ class Renderer : Tickable {
         val width = widthB[0]
         val height = heightB[0]
 
+        val zBuffer = Array(width + 1) { 0.0 }
+
         renderBackground(width, height)
 
-        renderWorld(world, camera, width, height)
+        renderWorld(world, camera, width, height, zBuffer)
+
+        renderSprites(world, camera, width, height, zBuffer)
     }
 
     private fun renderBackground(width: Int, height: Int) {
@@ -53,7 +57,7 @@ class Renderer : Tickable {
 
     }
 
-    private fun renderWorld(world: World, camera: Camera, width: Int, height: Int) {
+    private fun renderWorld(world: World, camera: Camera, width: Int, height: Int, zBuffer: Array<Double>) {
         for (column in 0..width) {
             val cameraX = 2 * column / width.toDouble() - 1 // X-coord in camera space
 
@@ -161,6 +165,9 @@ class Renderer : Tickable {
             brightnessG = min(brightnessG, 1.0) // No HDR for you
             brightnessB = min(brightnessB, 1.0) // No HDR for you
 
+            // Write to the z-buffer
+            zBuffer[column] = perpWallDist
+
             // Draw it
 
             glPushMatrix()
@@ -173,6 +180,53 @@ class Renderer : Tickable {
             glTexCoord2d(textureX + pixelWidth, 1.0); glVertex2i(column + 1, bottom)
             glTexCoord2d(textureX + pixelWidth, 0.0); glVertex2i(column + 1, top)
             glTexCoord2d(textureX, 0.0); glVertex2i(column, top)
+
+            glEnd()
+            glPopMatrix()
+        }
+    }
+
+    private fun renderSprites(world: World, camera: Camera, width: Int, height: Int, zBuffer: Array<Double>) {
+        val sprites = world.sprites
+
+        sprites.sortBy {
+            abs(it.x - camera.x).pow(2) + abs(it.y - camera.y).pow(2)
+        }
+        sprites.reverse()
+
+        sprites.forEach {
+            val spriteRelativeX = it.x - camera.x
+            val spriteRelativeY = it.y - camera.y
+
+            val inv = 1.0 / (camera.plane.first * camera.dir.second - camera.plane.second * camera.dir.first)
+
+            val spriteCameraSpaceX = inv * (camera.dir.second * spriteRelativeX - camera.dir.first * spriteRelativeY)
+            val spriteDepth = inv * (-camera.plane.second * spriteRelativeX + camera.plane.first * spriteRelativeY)
+
+            val spriteScreenSpaceX = ((width / 2) * (1 + spriteCameraSpaceX / spriteDepth)).toInt()
+
+            val depth = try {
+                zBuffer[spriteScreenSpaceX]
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                0.0
+            }
+
+            if (spriteDepth < 0 || spriteDepth > depth) // Do not render if sprite is behind camera or occluded
+                return@forEach
+
+            val spriteHeight = (height / spriteDepth).toInt()
+            val spriteWidth = spriteHeight * (it.texture.width / it.texture.height)
+
+            glPushMatrix()
+            glColor3d(1.0, 1.0, 1.0)
+            glEnable(GL_TEXTURE_2D)
+            it.texture.bind()
+
+            glBegin(GL_QUADS)
+            glTexCoord2d(0.0, 1.0); glVertex2i(spriteScreenSpaceX - (spriteWidth / 2), (height / 2) - (spriteHeight / 2))
+            glTexCoord2d(1.0, 1.0); glVertex2i(spriteScreenSpaceX + (spriteWidth / 2), (height / 2) - (spriteHeight / 2))
+            glTexCoord2d(1.0, 0.0); glVertex2i(spriteScreenSpaceX + (spriteWidth / 2), (height / 2) + (spriteHeight / 2))
+            glTexCoord2d(0.0, 0.0); glVertex2i(spriteScreenSpaceX - (spriteWidth / 2), (height / 2) + (spriteHeight / 2))
 
             glEnd()
             glPopMatrix()
