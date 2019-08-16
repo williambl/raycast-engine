@@ -8,7 +8,6 @@ import kotlin.math.abs
 
 class Renderer(): Tickable {
 
-
     override fun tick() {
         render(Main.world, Main.player)
     }
@@ -114,13 +113,14 @@ class Renderer(): Tickable {
             //println("$lineHeight")
 
             glPushMatrix()
-            glColor3f(0.0f, 1.0f * (lineHeight / height.toFloat()), 1.0f)
+            glEnable(GL_TEXTURE_2D)
+            world.wallTextures[result].bind()
 
             glBegin(GL_QUADS)
-            glVertex2i(column, bottom)
-            glVertex2i(column+1, bottom)
-            glVertex2i(column+1, top)
-            glVertex2i(column, top)
+            glTexCoord2d(0.0, 0.0); glVertex2i(column, bottom)
+            glTexCoord2d(1.0, 0.0); glVertex2i(column+1, bottom)
+            glTexCoord2d(1.0, 1.0); glVertex2i(column+1, top)
+            glTexCoord2d(0.0, 1.0); glVertex2i(column, top)
 
             glEnd()
             glPopMatrix()

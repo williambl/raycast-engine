@@ -44,6 +44,8 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
+    compile group: 'org.l33tlabs.twl', name: 'pngdecoder', version: '1.0'
+
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-assimp:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-bgfx:${lwjglVersion}"
