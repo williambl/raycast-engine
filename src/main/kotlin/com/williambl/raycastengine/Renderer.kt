@@ -144,17 +144,23 @@ class Renderer : Tickable {
 
             // Work out how light it should be
 
-            var brightness = 0.0
+            var brightnessR = 0.0
+            var brightnessG = 0.0
+            var brightnessB = 0.0
             world.lights.forEach {
-                brightness += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength
+                brightnessR += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.first
+                brightnessG += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.second
+                brightnessB += (1 / (abs(it.x - (player.x + perpWallDist * rayDirX)).pow(2) + abs(it.y - (player.y + perpWallDist * rayDirY)).pow(2))) * it.strength.third
             }
 
-            brightness = min(brightness, 1.0) // No HDR for you
+            brightnessR = min(brightnessR, 1.0) // No HDR for you
+            brightnessG = min(brightnessG, 1.0) // No HDR for you
+            brightnessB = min(brightnessB, 1.0) // No HDR for you
 
             // Draw it
 
             glPushMatrix()
-            glColor3d(brightness, brightness, brightness)
+            glColor3d(brightnessR, brightnessG, brightnessB)
             glEnable(GL_TEXTURE_2D)
             world.wallTextures[result].bind()
 

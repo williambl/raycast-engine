@@ -14,7 +14,7 @@ class World(val map: Array<Array<Int>>): StartupListener {
                 Texture("/stone.png")
         )
 
-        lights.add(Light(2.0, 2.0, 5.0))
+        lights.add(Light(2.0, 2.0, Triple(5.0, 3.0, 0.0)))
         lights.add(Light(7.0, 8.0, 5.0))
     }
 }
