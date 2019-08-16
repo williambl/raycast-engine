@@ -48,15 +48,15 @@ object Main {
         }
     }
 
-    fun init() {
+    private fun init() {
         initGLFW()
-        initOGL()
+        initGL()
 
         initInputListeners()
         initStartupListeners()
     }
 
-    fun initGLFW() {
+    private fun initGLFW() {
         //Initialize GLFW. Most GLFW functions will not work before doing this.
         if (!glfwInit()) {
             throw IllegalStateException("Unable to initialize GLFW")
@@ -81,7 +81,7 @@ object Main {
         glfwShowWindow(window)
     }
 
-    fun initOGL() {
+    private fun initGL() {
         GL.createCapabilities()
         // Set the clear color
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
@@ -91,25 +91,25 @@ object Main {
         glMatrixMode(GL_MODELVIEW)
     }
 
-    fun initInputListeners() {
+    private fun initInputListeners() {
         inputListeners.forEach {
             it.attachInputCallbacks()
         }
     }
 
-    fun initStartupListeners() {
+    private fun initStartupListeners() {
         startupListeners.forEach {
             it.onStart()
         }
     }
 
-    fun tickTickables() {
+    private fun tickTickables() {
         tickables.forEach {
             it.tick()
         }
     }
 
-    fun loop() {
+    private fun loop() {
         // Clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 

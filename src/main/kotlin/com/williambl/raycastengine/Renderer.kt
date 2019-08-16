@@ -7,13 +7,13 @@ import kotlin.math.abs
 import kotlin.math.floor
 
 
-class Renderer(): Tickable {
+class Renderer : Tickable {
 
     override fun tick() {
         render(Main.world, Main.player)
     }
 
-    fun render(world: World, player: Player) {
+    private fun render(world: World, player: Player) {
         val widthB = BufferUtils.createIntBuffer(1)
         val heightB = BufferUtils.createIntBuffer(1)
         glfwGetWindowSize(Main.window, widthB, heightB)
@@ -25,8 +25,7 @@ class Renderer(): Tickable {
         renderWorld(world, player, width, height)
     }
 
-    fun renderBackground(width: Int, height: Int) {
-
+    private fun renderBackground(width: Int, height: Int) {
         glPushMatrix()
         glDisable(GL_TEXTURE_2D)
         glColor3d(0.6, 0.6, 0.6)
@@ -48,36 +47,35 @@ class Renderer(): Tickable {
 
     }
 
-    fun renderWorld(world: World, player: Player, width: Int, height: Int) {
-
-
+    private fun renderWorld(world: World, player: Player, width: Int, height: Int) {
         for (column in 0..width) {
-            val cameraX = 2 * column / width.toDouble() - 1 // x-coord in camera space
+            val cameraX = 2 * column / width.toDouble() - 1 // X-coord in camera space
 
             val rayDirX = player.dir.first + player.plane.first * cameraX
             val rayDirY = player.dir.second + player.plane.second * cameraX
 
-            //What tile are we in?
+            // Coords of current square
             var mapX = player.x.toInt()
             var mapY = player.y.toInt()
 
-            //length of ray from current position to next x or y-side
+            // Length of ray from current position to next X or Y wall
+            // https://lodev.org/cgtutor/images/raycastdelta.gif
             var sideDistX: Double
             var sideDistY: Double
 
-            //Length of ray from one side to next in map
-            var deltaDistX = abs(1 / rayDirX)
-            var deltaDistY = abs(1 / rayDirY)
+            // Length of ray from one side to next in map
+            val deltaDistX = abs(1 / rayDirX)
+            val deltaDistY = abs(1 / rayDirY)
             var perpWallDist: Double
 
-            //Direction to go in x and y
+            // Direction to go in X and Y
             var stepX: Int
             var stepY: Int
 
-            var result = 0 //was a wall hit?
-            var side = 0 //was the wall vertical or horizontal
+            var result = 0 // Result of raycast
+            var side = 0 // Was the wall N-S or E-W
 
-            //Figure out the step direction and initial distance to a side
+            // Calculate vector to next square
             if (rayDirX < 0)
             {
                 stepX = -1
@@ -99,10 +97,10 @@ class Renderer(): Tickable {
                 sideDistY = (mapY + 1.0 - player.y) * deltaDistY
             }
 
-            //Loop to find where the ray hits a wall
+            // Loop to find where the ray hits a wall
             while(result == 0) {
 
-                //Jump to next square
+                // Jump to next square
                 if (sideDistX < sideDistY)
                 {
                     sideDistX += deltaDistX
@@ -116,7 +114,7 @@ class Renderer(): Tickable {
                     side = 1
                 }
 
-                //Check if ray has hit a wall
+                // Check if ray has hit a wall
                 result = try {
                     world.map[mapX][mapY]
                 } catch (e: ArrayIndexOutOfBoundsException) {
@@ -125,24 +123,24 @@ class Renderer(): Tickable {
                 }
             }
 
+            // Calculate distance from camera plane to wall
             perpWallDist = if (side == 0) (mapX - player.x + (1 - stepX) / 2) / rayDirX
             else (mapY - player.y + (1 - stepY) / 2) / rayDirY
 
-            //Calculate height of line to draw on screen
             val lineHeight = (height / perpWallDist).toInt()
 
-            //calculate lowest and highest pixel to fill in current stripe
+            // Calculate lowest and highest pixel to fill in current column
             val bottom = (-lineHeight / 2 + height / 2)
             val top = (lineHeight / 2 + height / 2)
 
-            //calculate which column of texture to use
-            var wallX = if (side == 0) player.y + perpWallDist * rayDirY
-            else           player.x + perpWallDist * rayDirX
-            wallX -= floor((wallX))
+            // Calculate which column of texture to use
+            var textureX = if (side == 0) player.y + perpWallDist * rayDirY
+            else player.x + perpWallDist * rayDirX
+            textureX -= floor((textureX))
 
             val pixelWidth = 1/world.wallTextures[result].width
 
-            //println("$lineHeight")
+            // Draw it
 
             glPushMatrix()
             glColor3d(1.0, 1.0, 1.0)
@@ -150,10 +148,10 @@ class Renderer(): Tickable {
             world.wallTextures[result].bind()
 
             glBegin(GL_QUADS)
-            glTexCoord2d(wallX, 1.0); glVertex2i(column, bottom)
-            glTexCoord2d(wallX+pixelWidth, 1.0); glVertex2i(column+1, bottom)
-            glTexCoord2d(wallX+pixelWidth, 0.0); glVertex2i(column+1, top)
-            glTexCoord2d(wallX, 0.0); glVertex2i(column, top)
+            glTexCoord2d(textureX, 1.0); glVertex2i(column, bottom)
+            glTexCoord2d(textureX + pixelWidth, 1.0); glVertex2i(column + 1, bottom)
+            glTexCoord2d(textureX + pixelWidth, 0.0); glVertex2i(column + 1, top)
+            glTexCoord2d(textureX, 0.0); glVertex2i(column, top)
 
             glEnd()
             glPopMatrix()

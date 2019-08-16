@@ -17,10 +17,10 @@ class Texture(val location: String) {
         val decoder = try {
             PNGDecoder(this::class.java.getResourceAsStream(location))
         } catch (e: IOException) {
-            println("$location is not a valid texture, skipping")
+            println("\"$location\" is not a valid texture, skipping")
             null
         } catch (e: NullPointerException) {
-            println("$location is not a valid texture, skipping")
+            println("\"$location\" is not a valid texture, skipping")
             null
         }
 
@@ -52,7 +52,7 @@ class Texture(val location: String) {
 
     fun bind() {
         if (id == -1) {
-            println("$location is not a valid texture")
+            println("\"$location\" is not a valid texture")
             return
         }
         glBindTexture(GL_TEXTURE_2D, id)

@@ -27,7 +27,7 @@ class Player(var x: Double, var y: Double): InputListener {
     val moveSpeed = 0.1
     val rotSpeed = 0.1
 
-    fun forward() {
+    private fun forward() {
         val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
         if (Main.world.map[(x+moveVec.first).toInt()][y.toInt()] == 0)
             x += moveVec.first
@@ -35,7 +35,7 @@ class Player(var x: Double, var y: Double): InputListener {
             y += moveVec.second
     }
 
-    fun backward() {
+    private fun backward() {
         val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
         if (Main.world.map[(x-moveVec.first).toInt()][y.toInt()] == 0)
             x -= moveVec.first
@@ -43,7 +43,7 @@ class Player(var x: Double, var y: Double): InputListener {
             y -= moveVec.second
     }
 
-    fun left() {
+    private fun left() {
         val dirX = dir.first * cos(rotSpeed) - dir.second * sin(rotSpeed)
         val dirY = dir.first * sin(rotSpeed) + dir.second * cos(rotSpeed)
         dir = Pair(dirX, dirY)
@@ -52,7 +52,7 @@ class Player(var x: Double, var y: Double): InputListener {
         plane = Pair(planeX, planeY)
     }
 
-    fun right() {
+    private fun right() {
         val dirX = dir.first * cos(-rotSpeed) - dir.second * sin(-rotSpeed)
         val dirY = dir.first * sin(-rotSpeed) + dir.second * cos(-rotSpeed)
         dir = Pair(dirX, dirY)
