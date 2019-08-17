@@ -9,7 +9,7 @@ import com.williambl.raycastengine.render.Texture
 import kotlin.reflect.jvm.kotlinFunction
 
 
-class World(val map: Array<Array<Int>>) : StartupListener, Tickable {
+class World(val map: Array<IntArray>) : StartupListener, Tickable {
 
     lateinit var wallTextures: Array<Texture>
 

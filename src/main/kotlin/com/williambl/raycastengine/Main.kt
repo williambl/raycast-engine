@@ -23,16 +23,16 @@ object Main {
     var windowTitle: String = "Raycaster"
 
     var world = World(arrayOf(
-            arrayOf(1, 1, 1, 1, 1, 1, 1, 2, 2, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 1, 1, 1, 0, 2, 2, 0, 2),
-            arrayOf(1, 0, 1, 0, 0, 0, 2, 0, 0, 2),
-            arrayOf(1, 0, 1, 0, 0, 0, 0, 0, 0, 2),
-            arrayOf(1, 1, 1, 2, 2, 2, 2, 2, 2, 2)
+            intArrayOf(1, 1, 1, 1, 1, 1, 1, 2, 2, 2),
+            intArrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 2),
+            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
+            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
+            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
+            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
+            intArrayOf(1, 0, 1, 1, 1, 0, 2, 2, 0, 2),
+            intArrayOf(1, 0, 1, 0, 0, 0, 2, 0, 0, 2),
+            intArrayOf(1, 0, 1, 0, 0, 0, 0, 0, 0, 2),
+            intArrayOf(1, 1, 1, 2, 2, 2, 2, 2, 2, 2)
     ))
 
     var player = Player(2.0, 2.0)
