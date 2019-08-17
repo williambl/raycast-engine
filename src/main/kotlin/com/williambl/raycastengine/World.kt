@@ -22,6 +22,8 @@ class World(val map: Array<Array<Int>>) : StartupListener, Tickable {
                 Texture("/stone.png")
         )
 
+        addGameObject(Main.player)
+
         addGameObject(Light(2.0, 2.0, Triple(5.0, 3.0, 0.0)))
         addGameObject(Light(7.0, 8.0, 5.0))
 
