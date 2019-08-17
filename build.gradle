@@ -38,6 +38,7 @@ application {
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
@@ -48,6 +49,8 @@ dependencies {
     compile group: 'org.l33tlabs.twl', name: 'pngdecoder', version: '1.0'
 
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+
+    implementation 'com.beust:klaxon:5.0.1'
 
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-assimp:${lwjglVersion}"

@@ -22,18 +22,7 @@ object Main {
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
 
-    var world = World(arrayOf(
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 2, 2, 2),
-            intArrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 2),
-            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            intArrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            intArrayOf(1, 0, 1, 1, 1, 0, 2, 2, 0, 2),
-            intArrayOf(1, 0, 1, 0, 0, 0, 2, 0, 0, 2),
-            intArrayOf(1, 0, 1, 0, 0, 0, 0, 0, 0, 2),
-            intArrayOf(1, 1, 1, 2, 2, 2, 2, 2, 2, 2)
-    ))
+    var world = WorldLoader("/world.json").load()
 
     var player = Player(2.0, 2.0)
     var renderer = Renderer()
@@ -68,7 +57,7 @@ object Main {
         initGLFW()
         initGL()
 
-        println(gameObjectClasses.entries)
+
         initInputListeners()
         initStartupListeners()
     }
