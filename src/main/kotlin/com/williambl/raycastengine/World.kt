@@ -6,6 +6,7 @@ import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Light
 import com.williambl.raycastengine.gameobject.MovingSprite
 import com.williambl.raycastengine.render.Texture
+import kotlin.reflect.jvm.kotlinFunction
 
 
 class World(val map: Array<Array<Int>>) : StartupListener, Tickable {
@@ -24,7 +25,7 @@ class World(val map: Array<Array<Int>>) : StartupListener, Tickable {
 
         addGameObject(Main.player)
 
-        addGameObject(Light(2.0, 2.0, Triple(5.0, 3.0, 0.0)))
+        addGameObject(createGameObject("com.williambl.raycastengine.gameobject.Light", 2.0, 2.0, 5.0, 3.0, 0.0)!!)
         addGameObject(Light(7.0, 8.0, 5.0))
 
         addGameObject(MovingSprite(Texture("/face.png"), 5.0, 5.0))
@@ -49,6 +50,14 @@ class World(val map: Array<Array<Int>>) : StartupListener, Tickable {
         return gameObjects.filterIsInstance(klass)
     }
 
+    /*
+     * Creates a new gameObject from the classname and arguments. Only works if all the arguments are primitives.
+     */
+    fun createGameObject(className: String, vararg args: Any): GameObject? {
+        val argClasses = args.map {
+            it::class.javaPrimitiveType
+        }.toTypedArray()
 
-
+        return Main.gameObjectClasses[className]?.getConstructor(*argClasses)?.kotlinFunction?.call(*args)
+    }
 }

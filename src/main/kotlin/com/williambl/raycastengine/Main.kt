@@ -3,12 +3,16 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.render.Renderer
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
+import org.reflections.Reflections
+
+
 
 
 object Main {
@@ -45,6 +49,12 @@ object Main {
             world
     )
 
+    val reflections = Reflections("com.williambl.raycastengine")
+
+    val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
+        it.name to it
+    }.toMap()
+
     @JvmStatic
     fun main(args: Array<String>) {
         init()
@@ -58,6 +68,7 @@ object Main {
         initGLFW()
         initGL()
 
+        println(gameObjectClasses.entries)
         initInputListeners()
         initStartupListeners()
     }
