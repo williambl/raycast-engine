@@ -22,6 +22,12 @@ object Main {
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
 
+    val reflections = Reflections("com.williambl.raycastengine")
+
+    val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
+        it.name to it
+    }.toMap()
+
     var world = WorldLoader("/world.json").load()
 
     var player = Player(2.0, 2.0)
@@ -38,11 +44,7 @@ object Main {
             world
     )
 
-    val reflections = Reflections("com.williambl.raycastengine")
 
-    val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
-        it.name to it
-    }.toMap()
 
     @JvmStatic
     fun main(args: Array<String>) {
