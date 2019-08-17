@@ -16,11 +16,14 @@ class WorldLoader(val worldFile: String) {
         val gameObjects = json.array<JsonObject>("gameObjects")
         if (gameObjects != null) {
             for (gameObjectRepresentation in gameObjects) {
-                println(gameObjectRepresentation.string("class"))
                 val gameObject = world.createGameObject(
                         gameObjectRepresentation.string("class")!!,
                         *(gameObjectRepresentation.array<Any>("args")!!.toTypedArray())
-                ) ?: continue
+                )
+                if (gameObject == null) {
+                    println(gameObjectRepresentation.string("class") + " is not a valid gameObject, skipping")
+                    continue
+                }
 
                 world.addGameObject(gameObject)
             }
