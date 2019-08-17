@@ -35,7 +35,8 @@ object Main {
     var renderer = Renderer()
 
     var tickables: Array<Tickable> = arrayOf(
-            renderer
+            renderer,
+            world
     )
     var inputListeners: Array<InputListener> = arrayOf(
             player

@@ -4,6 +4,8 @@ import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.World
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Camera
+import com.williambl.raycastengine.gameobject.Light
+import com.williambl.raycastengine.gameobject.Sprite
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
@@ -176,7 +178,7 @@ class Renderer : Tickable {
     }
 
     private fun renderSprites(world: World, camera: Camera, width: Int, height: Int, zBuffer: Array<Double>) {
-        val sprites = world.sprites
+        val sprites = world.getGameObjectsOfType(Sprite::class.java) as ArrayList
 
         sprites.sortBy {
             abs(it.x - camera.x).pow(2) + abs(it.y - camera.y).pow(2)
@@ -232,7 +234,7 @@ class Renderer : Tickable {
         var brightnessR = 0.0
         var brightnessG = 0.0
         var brightnessB = 0.0
-        world.lights.forEach {
+        world.getGameObjectsOfType(Light::class.java).forEach {
             brightnessR += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.first
             brightnessG += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.second
             brightnessB += (1 / ((it.x - x).pow(2) + (it.y - y).pow(2))) * it.strength.third
