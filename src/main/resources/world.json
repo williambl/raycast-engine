@@ -121,6 +121,11 @@
       2
     ]
   ],
+  "wallTextures": [
+    "",
+    "/brick.png",
+    "/stone.png"
+  ],
   "gameObjects": [
     {
       "class": "com.williambl.raycastengine.gameobject.Light",

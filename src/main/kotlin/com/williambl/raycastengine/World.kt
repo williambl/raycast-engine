@@ -16,14 +16,7 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
         private set
 
     override fun onStart() {
-        wallTextures = arrayOf(
-                Texture(""),
-                Texture("/brick.png"),
-                Texture("/stone.png")
-        )
-
         addGameObject(Main.player)
-
     }
 
     override fun tick() {

@@ -3,6 +3,7 @@ package com.williambl.raycastengine
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
+import com.williambl.raycastengine.render.Texture
 
 class WorldLoader(val worldFile: String) {
 
@@ -12,6 +13,10 @@ class WorldLoader(val worldFile: String) {
         val mapArray = json.array<JsonArray<Int>>("map")
 
         val world = World(mapArray!!.map { it.toIntArray() }.toTypedArray())
+
+        world.wallTextures = json.array<String>("wallTextures")!!.map {
+            Texture(it)
+        }.toTypedArray()
 
         val gameObjects = json.array<JsonObject>("gameObjects")
         if (gameObjects != null) {
