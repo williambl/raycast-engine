@@ -3,12 +3,16 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.render.Renderer
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
+import org.reflections.Reflections
+
+
 
 
 object Main {
@@ -18,32 +22,27 @@ object Main {
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
 
-    var world = World(arrayOf(
-            arrayOf(1, 1, 1, 1, 1, 1, 1, 2, 2, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 0, 0, 0, 0, 0, 2, 0, 2),
-            arrayOf(1, 0, 1, 1, 1, 0, 2, 2, 0, 2),
-            arrayOf(1, 0, 1, 0, 0, 0, 2, 0, 0, 2),
-            arrayOf(1, 0, 1, 0, 0, 0, 0, 0, 0, 2),
-            arrayOf(1, 1, 1, 2, 2, 2, 2, 2, 2, 2)
-    ))
+    val reflections = Reflections("com.williambl.raycastengine")
+
+    val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
+        it.name to it
+    }.toMap()
+
+    lateinit var world: World
 
     var player = Player(2.0, 2.0)
     var renderer = Renderer()
 
-    var tickables: Array<Tickable> = arrayOf(
-            renderer,
-            world
+    var tickables: ArrayList<Tickable> = arrayListOf(
+            renderer
     )
-    var inputListeners: Array<InputListener> = arrayOf(
+    var inputListeners: ArrayList<InputListener> = arrayListOf(
             player
     )
-    var startupListeners: Array<StartupListener> = arrayOf(
-            world
+    var startupListeners: ArrayList<StartupListener> = arrayListOf(
     )
+
+
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -58,6 +57,9 @@ object Main {
         initGLFW()
         initGL()
 
+        world = WorldLoader("/world.json").load()
+        tickables.add(world)
+        startupListeners.add(world)
         initInputListeners()
         initStartupListeners()
     }
