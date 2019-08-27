@@ -28,20 +28,18 @@ object Main {
         it.name to it
     }.toMap()
 
-    var world = WorldLoader("/world.json").load()
+    lateinit var world: World
 
     var player = Player(2.0, 2.0)
     var renderer = Renderer()
 
-    var tickables: Array<Tickable> = arrayOf(
-            renderer,
-            world
+    var tickables: ArrayList<Tickable> = arrayListOf(
+            renderer
     )
-    var inputListeners: Array<InputListener> = arrayOf(
+    var inputListeners: ArrayList<InputListener> = arrayListOf(
             player
     )
-    var startupListeners: Array<StartupListener> = arrayOf(
-            world
+    var startupListeners: ArrayList<StartupListener> = arrayListOf(
     )
 
 
@@ -59,7 +57,9 @@ object Main {
         initGLFW()
         initGL()
 
-
+        world = WorldLoader("/world.json").load()
+        tickables.add(world)
+        startupListeners.add(world)
         initInputListeners()
         initStartupListeners()
     }

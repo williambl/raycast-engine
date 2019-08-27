@@ -7,6 +7,8 @@ import kotlin.random.Random
 
 class MovingSprite(texture: Texture, x: Double, y: Double) : Sprite(texture, x, y), Tickable {
 
+    constructor(textureString: String, x: Double, y: Double) : this(Texture(textureString), x, y)
+
     val rand = Random(345323 + x.toInt() + y.toInt())
 
     override fun tick() {

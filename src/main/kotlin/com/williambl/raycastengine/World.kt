@@ -24,7 +24,6 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
 
         addGameObject(Main.player)
 
-        addGameObject(MovingSprite(Texture("/face.png"), 5.0, 5.0))
     }
 
     override fun tick() {
@@ -49,11 +48,8 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
     /*
      * Creates a new gameObject from the classname and arguments. Only works if all the arguments are primitives.
      */
-    fun createGameObject(className: String, vararg args: Any): GameObject? {
-        val argClasses = args.map {
-            it::class.javaPrimitiveType
-        }.toTypedArray()
-
-        return Main.gameObjectClasses[className]?.getConstructor(*argClasses)?.kotlinFunction?.call(*args)
+    fun createGameObject(className: String, constructor: Int, vararg args: Any): GameObject? {
+        println(Main.gameObjectClasses[className]?.constructors?.contentToString())
+        return Main.gameObjectClasses[className]?.constructors?.get(constructor)?.newInstance(*args) as GameObject?
     }
 }
