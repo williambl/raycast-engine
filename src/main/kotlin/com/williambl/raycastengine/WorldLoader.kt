@@ -18,6 +18,7 @@ class WorldLoader(val worldFile: String) {
             for (gameObjectRepresentation in gameObjects) {
                 val gameObject = world.createGameObject(
                         gameObjectRepresentation.string("class")!!,
+                        gameObjectRepresentation.int("constructor") ?: 0,
                         *(gameObjectRepresentation.array<Any>("args")!!.toTypedArray())
                 )
                 if (gameObject == null) {
