@@ -34,6 +34,8 @@ version '1.0-SNAPSHOT'
 
 application {
     mainClassName = 'com.williambl.raycastengine.Main'
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS)
+        applicationDefaultJvmArgs.push("-XstartOnFirstThread")
 }
 
 repositories {
