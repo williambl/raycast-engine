@@ -18,7 +18,7 @@ object Main {
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
 
-    val reflections = Reflections("com.williambl.raycastengine")
+    val reflections = Reflections("")
 
     val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
         it.name to it
@@ -35,8 +35,6 @@ object Main {
     )
 
     var startupListeners: ArrayList<StartupListener> = arrayListOf()
-
-
 
     @JvmStatic
     fun main(args: Array<String>) {
