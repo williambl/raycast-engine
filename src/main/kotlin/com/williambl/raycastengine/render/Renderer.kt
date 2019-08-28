@@ -15,10 +15,10 @@ import kotlin.math.min
 import kotlin.math.pow
 
 
-class Renderer : Tickable {
+class Renderer(val world: World, val camera: Camera) : Tickable {
 
     override fun tick() {
-        render(Main.world, Main.player)
+        render(world, camera)
     }
 
     private fun render(world: World, camera: Camera) {

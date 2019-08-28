@@ -3,9 +3,7 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
-import com.williambl.raycastengine.gameobject.MovingSprite
 import com.williambl.raycastengine.render.Texture
-import kotlin.reflect.jvm.kotlinFunction
 
 
 class World(val map: Array<IntArray>) : StartupListener, Tickable {
@@ -15,9 +13,7 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
     var gameObjects: ArrayList<GameObject> = arrayListOf()
         private set
 
-    override fun onStart() {
-        addGameObject(Main.player)
-    }
+    override fun onStart() {}
 
     override fun tick() {
         gameObjects.forEach {
@@ -27,6 +23,7 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
     }
 
     fun addGameObject(gameObject: GameObject) {
+        gameObject.world = this
         gameObjects.add(gameObject)
     }
 

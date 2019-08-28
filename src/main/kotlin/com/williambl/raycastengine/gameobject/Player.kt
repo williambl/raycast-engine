@@ -1,45 +1,27 @@
 package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.Main
-import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.Tickable
-import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.glfw.GLFWKeyCallback
+import com.williambl.raycastengine.render.Renderer
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(x: Double, y: Double) : Camera(x, y), InputListener, Tickable {
+class Player(x: Double, y: Double) : Camera(x, y), Tickable {
 
-    var shouldGoForward = false
-    var shouldGoBackward = false
-    var shouldGoLeft = false
-    var shouldGoRight = false
-
-    override fun attachInputCallbacks() {
-        glfwSetKeyCallback(Main.window, GLFWKeyCallback.create { window, key, scancode, action, mods ->
-            if (action in arrayOf(GLFW_PRESS, GLFW_RELEASE)) {
-                if (key == GLFW_KEY_W)
-                    shouldGoForward = action == GLFW_PRESS
-                if (key == GLFW_KEY_S)
-                    shouldGoBackward = action == GLFW_PRESS
-                if (key == GLFW_KEY_A)
-                    shouldGoLeft = action == GLFW_PRESS
-                if (key == GLFW_KEY_D)
-                    shouldGoRight = action == GLFW_PRESS
-            }
-        })
-    }
+    val renderer: Renderer by lazy { Renderer(world, this) }
 
     override fun tick() {
-        if (shouldGoForward)
+        if (Main.inputManager.shouldGoForward)
             forward()
-        if (shouldGoBackward)
+        if (Main.inputManager.shouldGoBackward)
             backward()
-        if (shouldGoLeft)
+        if (Main.inputManager.shouldGoLeft)
             left()
-        if (shouldGoRight)
+        if (Main.inputManager.shouldGoRight)
             right()
+
+        renderer.tick()
     }
 
     val moveSpeed = 0.075

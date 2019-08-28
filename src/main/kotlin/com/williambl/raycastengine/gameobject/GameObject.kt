@@ -1,3 +1,8 @@
 package com.williambl.raycastengine.gameobject
 
-open class GameObject(var x: Double, var y: Double)
+import com.williambl.raycastengine.World
+
+open class GameObject(var x: Double, var y: Double) {
+
+    lateinit var world: World
+}

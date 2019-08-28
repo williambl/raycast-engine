@@ -4,15 +4,11 @@ import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
-import com.williambl.raycastengine.gameobject.Player
-import com.williambl.raycastengine.render.Renderer
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
 import org.reflections.Reflections
-
-
 
 
 object Main {
@@ -30,17 +26,15 @@ object Main {
 
     lateinit var world: World
 
-    var player = Player(2.0, 2.0)
-    var renderer = Renderer()
+    var inputManager = InputManager()
 
-    var tickables: ArrayList<Tickable> = arrayListOf(
-            renderer
-    )
+    var tickables: ArrayList<Tickable> = arrayListOf()
+
     var inputListeners: ArrayList<InputListener> = arrayListOf(
-            player
+            inputManager
     )
-    var startupListeners: ArrayList<StartupListener> = arrayListOf(
-    )
+
+    var startupListeners: ArrayList<StartupListener> = arrayListOf()
 
 
 
