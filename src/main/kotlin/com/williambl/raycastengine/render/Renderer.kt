@@ -199,7 +199,7 @@ class Renderer(val world: World, val camera: Camera) : Tickable {
             val depth = try {
                 zBuffer[spriteScreenSpaceX]
             } catch (e: ArrayIndexOutOfBoundsException) {
-                0.0
+                1.0
             }
 
             if (spriteDepth < 0 || spriteDepth > depth) // Do not render if sprite is behind camera or occluded
