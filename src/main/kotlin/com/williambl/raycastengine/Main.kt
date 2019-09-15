@@ -5,6 +5,7 @@ import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
@@ -57,6 +58,9 @@ object Main {
     }
 
     private fun initGLFW() {
+        //Create an error callback to tell us if something goes wrong
+        GLFWErrorCallback.createPrint(System.err).set()
+
         //Initialize GLFW. Most GLFW functions will not work before doing this.
         if (!glfwInit()) {
             throw IllegalStateException("Unable to initialize GLFW")
