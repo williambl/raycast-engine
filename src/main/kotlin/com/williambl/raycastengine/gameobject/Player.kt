@@ -2,14 +2,14 @@ package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.render.Renderer
+import com.williambl.raycastengine.render.WorldRenderer
 import kotlin.math.cos
 import kotlin.math.sin
 
 
 class Player(x: Double, y: Double) : Camera(x, y), Tickable {
 
-    val renderer: Renderer by lazy { Renderer(world, this) }
+    val worldRenderer: WorldRenderer by lazy { WorldRenderer(world, this) }
 
     override fun tick() {
         if (Main.inputManager.shouldGoForward)
@@ -21,7 +21,7 @@ class Player(x: Double, y: Double) : Camera(x, y), Tickable {
         if (Main.inputManager.shouldGoRight)
             right()
 
-        renderer.tick()
+        worldRenderer.tick()
     }
 
     val moveSpeed = 0.075

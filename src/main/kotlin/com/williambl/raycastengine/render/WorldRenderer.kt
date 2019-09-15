@@ -4,8 +4,8 @@ import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.World
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Camera
+import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Light
-import com.williambl.raycastengine.gameobject.Sprite
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
@@ -15,7 +15,7 @@ import kotlin.math.min
 import kotlin.math.pow
 
 
-class Renderer(val world: World, val camera: Camera) : Tickable {
+class WorldRenderer(val world: World, val camera: Camera) : Tickable {
 
     override fun tick() {
         render(world, camera)
@@ -30,38 +30,40 @@ class Renderer(val world: World, val camera: Camera) : Tickable {
 
         val zBuffer = Array(width + 1) { 0.0 }
 
-        renderBackground(width, height)
+        val context = RenderingContext(world, camera, width, height, zBuffer, this)
 
-        renderWorld(world, camera, width, height, zBuffer)
+        renderBackground(context)
 
-        renderSprites(world, camera, width, height, zBuffer)
+        renderWorld(context)
+
+        renderRenderables(context)
     }
 
-    private fun renderBackground(width: Int, height: Int) {
+    private fun renderBackground(context: RenderingContext) {
         glPushMatrix()
         glDisable(GL_TEXTURE_2D)
         glColor3d(0.6, 0.6, 0.6)
         glBegin(GL_QUADS)
         glVertex2i(0, 0)
-        glVertex2i(width, 0)
-        glVertex2i(width, height/2)
-        glVertex2i(0, height/2)
+        glVertex2i(context.width, 0)
+        glVertex2i(context.width, context.height/2)
+        glVertex2i(0, context.height/2)
         glEnd()
 
         glColor3d(0.1, 0.1, 0.1)
-        glVertex2i(0, height/2)
-        glVertex2i(width, height/2)
-        glVertex2i(width, height)
-        glVertex2i(0, height)
+        glVertex2i(0, context.height/2)
+        glVertex2i(context.width, context.height/2)
+        glVertex2i(context.width, context.height)
+        glVertex2i(0, context.height)
         glEnd()
 
         glPopMatrix()
 
     }
 
-    private fun renderWorld(world: World, camera: Camera, width: Int, height: Int, zBuffer: Array<Double>) {
-        for (column in 0..width) {
-            val cameraX = 2 * column / width.toDouble() - 1 // X-coord in camera space
+    private fun renderWorld(context: RenderingContext) {
+        for (column in 0..context.width) {
+            val cameraX = 2 * column / context.width.toDouble() - 1 // X-coord in camera space
 
             val rayDirX = camera.dir.first + camera.plane.first * cameraX
             val rayDirY = camera.dir.second + camera.plane.second * cameraX
@@ -139,11 +141,11 @@ class Renderer(val world: World, val camera: Camera) : Tickable {
             perpWallDist = if (side == 0) (mapX - camera.x + (1 - stepX) / 2) / rayDirX
             else (mapY - camera.y + (1 - stepY) / 2) / rayDirY
 
-            val lineHeight = (height / perpWallDist).toInt()
+            val lineHeight = (context.height / perpWallDist).toInt()
 
             // Calculate lowest and highest pixel to fill in current column
-            val bottom = (-lineHeight / 2 + height / 2)
-            val top = (lineHeight / 2 + height / 2)
+            val bottom = (-lineHeight / 2 + context.height / 2)
+            val top = (lineHeight / 2 + context.height / 2)
 
             // Calculate which column of texture to use
             var textureX = if (side == 0) camera.y + perpWallDist * rayDirY
@@ -157,7 +159,7 @@ class Renderer(val world: World, val camera: Camera) : Tickable {
             val brightness = calculateLighting(world, (camera.x + perpWallDist * rayDirX), (camera.y + perpWallDist * rayDirY))
 
             // Write to the z-buffer
-            zBuffer[column] = perpWallDist
+            context.zBuffer[column] = perpWallDist
 
             // Draw it
 
@@ -177,60 +179,20 @@ class Renderer(val world: World, val camera: Camera) : Tickable {
         }
     }
 
-    private fun renderSprites(world: World, camera: Camera, width: Int, height: Int, zBuffer: Array<Double>) {
-        val sprites = world.getGameObjectsOfType(Sprite::class.java) as ArrayList
+    private fun renderRenderables(context: RenderingContext) {
+        val renderables = context.world.getGameObjectsOfType(Renderable::class.java).map { it as Renderable<GameObject> } as ArrayList
 
-        sprites.sortBy {
-            abs(it.x - camera.x).pow(2) + abs(it.y - camera.y).pow(2)
+        renderables.sortBy {
+            abs((it as GameObject).x - camera.x).pow(2) + abs((it as GameObject).y - camera.y).pow(2)
         }
-        sprites.reverse()
+        renderables.reverse()
 
-        sprites.forEach {
-            val spriteRelativeX = it.x - camera.x
-            val spriteRelativeY = it.y - camera.y
-
-            val inv = 1.0 / (camera.plane.first * camera.dir.second - camera.plane.second * camera.dir.first)
-
-            val spriteCameraSpaceX = inv * (camera.dir.second * spriteRelativeX - camera.dir.first * spriteRelativeY)
-            val spriteDepth = inv * (-camera.plane.second * spriteRelativeX + camera.plane.first * spriteRelativeY)
-
-            val spriteScreenSpaceX = ((width / 2) * (1 + spriteCameraSpaceX / spriteDepth)).toInt()
-
-            val depth = try {
-                zBuffer[spriteScreenSpaceX]
-            } catch (e: ArrayIndexOutOfBoundsException) {
-                1.0
-            }
-
-            if (spriteDepth < 0 || spriteDepth > depth) // Do not render if sprite is behind camera or occluded
-                return@forEach
-
-            val spriteHeight = (height / spriteDepth).toInt()
-            val spriteWidth = spriteHeight * (it.texture.width / it.texture.height)
-
-            val brightness = calculateLighting(world, it.x, it.y)
-
-            glPushMatrix()
-            glColor3d(brightness.first, brightness.second, brightness.third)
-
-            glAlphaFunc(GL_GREATER, 0.5f)
-            glEnable(GL_ALPHA_TEST)
-
-            glEnable(GL_TEXTURE_2D)
-            it.texture.bind()
-
-            glBegin(GL_QUADS)
-            glTexCoord2d(0.0, 1.0); glVertex2i(spriteScreenSpaceX - (spriteWidth / 2), (height / 2) - (spriteHeight / 2))
-            glTexCoord2d(1.0, 1.0); glVertex2i(spriteScreenSpaceX + (spriteWidth / 2), (height / 2) - (spriteHeight / 2))
-            glTexCoord2d(1.0, 0.0); glVertex2i(spriteScreenSpaceX + (spriteWidth / 2), (height / 2) + (spriteHeight / 2))
-            glTexCoord2d(0.0, 0.0); glVertex2i(spriteScreenSpaceX - (spriteWidth / 2), (height / 2) + (spriteHeight / 2))
-
-            glEnd()
-            glPopMatrix()
+        renderables.forEach {
+            it.getRenderer().invoke(it as GameObject, context)
         }
     }
 
-    private fun calculateLighting(world: World, x: Double, y: Double): Triple<Double, Double, Double> {
+    internal fun calculateLighting(world: World, x: Double, y: Double): Triple<Double, Double, Double> {
         var brightnessR = 0.0
         var brightnessG = 0.0
         var brightnessB = 0.0

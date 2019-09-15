@@ -31,7 +31,7 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
         gameObjects.remove(gameObject)
     }
 
-    fun <T : GameObject> getGameObjectsOfType(klass: Class<T>): List<T> {
+    fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T> {
         return gameObjects.filterIsInstance(klass)
     }
 
