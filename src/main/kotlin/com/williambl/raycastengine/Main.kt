@@ -4,6 +4,7 @@ import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
+import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
@@ -41,9 +42,11 @@ object Main {
     fun main(args: Array<String>) {
         init()
 
-        while (true) {
+        while (!glfwWindowShouldClose(window)) {
             loop()
         }
+
+        cleanup()
     }
 
     private fun init() {
@@ -55,6 +58,16 @@ object Main {
         startupListeners.add(world)
         initInputListeners()
         initStartupListeners()
+    }
+
+    private fun cleanup() {
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     private fun initGLFW() {
