@@ -40,7 +40,7 @@ object Main {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        init()
+        init(args)
 
         while (!glfwWindowShouldClose(window)) {
             loop()
@@ -49,11 +49,11 @@ object Main {
         cleanup()
     }
 
-    private fun init() {
+    private fun init(args: Array<String>) {
         initGLFW()
         initGL()
 
-        world = WorldLoader("/world.json").load()
+        world = WorldLoader(args.getOrElse(0) { "/world.json" }).load()
         tickables.add(world)
         startupListeners.add(world)
         initInputListeners()
