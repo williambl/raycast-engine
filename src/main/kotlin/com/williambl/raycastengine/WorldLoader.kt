@@ -14,6 +14,16 @@ class WorldLoader(val worldFile: String) {
 
         val world = World(mapArray!!.map { it.toIntArray() }.toTypedArray())
 
+        val worldProperties = json.obj("worldProperties")
+        if (worldProperties != null) {
+            val floorColor = worldProperties.array<Double>("floorColor")
+            val skyColor = worldProperties.array<Double>("skyColor")
+            if (floorColor != null)
+                world.floorColor = Triple(floorColor[0], floorColor[1], floorColor[2])
+            if (skyColor != null)
+                world.skyColor = Triple(skyColor[0], skyColor[1], skyColor[2])
+        }
+
         world.wallTextures = json.array<String>("wallTextures")!!.map {
             Texture(it)
         }.toTypedArray()

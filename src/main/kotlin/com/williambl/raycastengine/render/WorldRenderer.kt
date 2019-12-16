@@ -42,7 +42,7 @@ class WorldRenderer(val world: World, val camera: Camera) : Tickable {
     private fun renderBackground(context: RenderingContext) {
         glPushMatrix()
         glDisable(GL_TEXTURE_2D)
-        glColor3d(0.6, 0.6, 0.6)
+        glColor3d(context.world.floorColor.first, context.world.floorColor.second, context.world.floorColor.third)
         glBegin(GL_QUADS)
         glVertex2i(0, 0)
         glVertex2i(context.width, 0)
@@ -50,7 +50,8 @@ class WorldRenderer(val world: World, val camera: Camera) : Tickable {
         glVertex2i(0, context.height/2)
         glEnd()
 
-        glColor3d(0.1, 0.1, 0.1)
+        glBegin(GL_QUADS)
+        glColor3d(context.world.skyColor.first, context.world.skyColor.second, context.world.skyColor.third)
         glVertex2i(0, context.height/2)
         glVertex2i(context.width, context.height/2)
         glVertex2i(context.width, context.height)

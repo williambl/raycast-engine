@@ -13,6 +13,9 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
     var gameObjects: ArrayList<GameObject> = arrayListOf()
         private set
 
+    var floorColor = Triple(0.0, 0.0, 0.0)
+    var skyColor = Triple(1.0, 1.0, 1.0)
+
     override fun onStart() {}
 
     override fun tick() {
