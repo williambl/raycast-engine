@@ -1,4 +1,5 @@
 {
+  "interpreter": "com.williambl.raycastengine.world.DefaultWorldInterpreter",
   "map": [
     [
       1,

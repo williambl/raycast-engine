@@ -1,12 +1,12 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.world
 
-import com.williambl.raycastengine.events.StartupListener
+import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.render.Texture
 
 
-class World(val map: Array<IntArray>) : StartupListener, Tickable {
+class DefaultWorld(override val map: Array<IntArray>) : World {
 
     lateinit var wallTextures: Array<Texture>
 
@@ -25,23 +25,23 @@ class World(val map: Array<IntArray>) : StartupListener, Tickable {
         }
     }
 
-    fun addGameObject(gameObject: GameObject) {
+    override fun addGameObject(gameObject: GameObject) {
         gameObject.world = this
         gameObjects.add(gameObject)
     }
 
-    fun removeGameObject(gameObject: GameObject) {
+    override fun removeGameObject(gameObject: GameObject) {
         gameObjects.remove(gameObject)
     }
 
-    fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T> {
+    override fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T> {
         return gameObjects.filterIsInstance(klass)
     }
 
     /*
      * Creates a new gameObject from the classname and arguments. Only works if all the arguments are primitives.
      */
-    fun createGameObject(className: String, constructor: Int, vararg args: Any): GameObject? {
+    override fun createGameObject(className: String, constructor: Int, vararg args: Any): GameObject? {
         println(Main.gameObjectClasses[className]?.constructors?.contentToString())
         return Main.gameObjectClasses[className]?.constructors?.get(constructor)?.newInstance(*args) as GameObject?
     }

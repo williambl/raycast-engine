@@ -1,11 +1,12 @@
 package com.williambl.raycastengine.render
 
 import com.williambl.raycastengine.Main
-import com.williambl.raycastengine.World
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Camera
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Light
+import com.williambl.raycastengine.world.DefaultWorld
+import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import org.lwjgl.opengl.GL11.*
@@ -15,13 +16,13 @@ import kotlin.math.min
 import kotlin.math.pow
 
 
-class WorldRenderer(val world: World, val camera: Camera) : Tickable {
+class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
 
     override fun tick() {
         render(world, camera)
     }
 
-    private fun render(world: World, camera: Camera) {
+    private fun render(world: DefaultWorld, camera: Camera) {
         val widthB = BufferUtils.createIntBuffer(1)
         val heightB = BufferUtils.createIntBuffer(1)
         glfwGetWindowSize(Main.window, widthB, heightB)

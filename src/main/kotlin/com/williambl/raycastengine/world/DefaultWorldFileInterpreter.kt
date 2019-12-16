@@ -1,18 +1,15 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.world
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
 import com.williambl.raycastengine.render.Texture
 
-class WorldLoader(val worldFile: String) {
+class DefaultWorldFileInterpreter: WorldFileInterpreter {
 
-    fun load(): World {
-        val json = Parser.default().parse(this::class.java.getResource(worldFile).path) as JsonObject
-
+    override fun interpretWorldFile(json: JsonObject): World {
         val mapArray = json.array<JsonArray<Int>>("map")
 
-        val world = World(mapArray!!.map { it.toIntArray() }.toTypedArray())
+        val world = DefaultWorld(mapArray!!.map { it.toIntArray() }.toTypedArray())
 
         val worldProperties = json.obj("worldProperties")
         if (worldProperties != null) {

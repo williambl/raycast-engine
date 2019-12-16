@@ -2,14 +2,15 @@ package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.render.WorldRenderer
+import com.williambl.raycastengine.render.DefaultWorldRenderer
+import com.williambl.raycastengine.world.DefaultWorld
 import kotlin.math.cos
 import kotlin.math.sin
 
 
 class Player(x: Double, y: Double) : Camera(x, y), Tickable {
 
-    val worldRenderer: WorldRenderer by lazy { WorldRenderer(world, this) }
+    val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
 
     override fun tick() {
         if (Main.inputManager.shouldGoForward)

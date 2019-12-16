@@ -1,9 +1,9 @@
 package com.williambl.raycastengine.render
 
-import com.williambl.raycastengine.World
 import com.williambl.raycastengine.gameobject.Camera
+import com.williambl.raycastengine.world.DefaultWorld
 
-data class RenderingContext(val world: World, val camera: Camera, val width: Int, val height: Int, val zBuffer: Array<Double>, val worldRenderer: WorldRenderer) {
+data class RenderingContext(val world: DefaultWorld, val camera: Camera, val width: Int, val height: Int, val zBuffer: Array<Double>, val worldRenderer: DefaultWorldRenderer) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
