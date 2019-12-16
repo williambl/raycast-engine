@@ -11,7 +11,7 @@ class WorldLoader(val worldFile: String) {
     }.toMap()
 
     fun load(): World {
-        val json = Parser.default().parse(this::class.java.getResource(worldFile).path) as JsonObject
+        val json = Parser.default().parse(this::class.java.getResourceAsStream(worldFile).reader()) as JsonObject
 
         var interpreter = worldFileInterpreterClasses[json.string("interpreter")]
         if (interpreter == null) {
