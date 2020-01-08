@@ -69,7 +69,7 @@ object Main {
 
         // Terminate GLFW and free the error callback
         glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        glfwSetErrorCallback(null)?.free();
     }
 
     private fun initGLFW() {
@@ -85,6 +85,10 @@ object Main {
         glfwDefaultWindowHints()
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE)
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5)
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
         window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, NULL, NULL)
         if (window == NULL) {
@@ -102,12 +106,9 @@ object Main {
 
     private fun initGL() {
         GL.createCapabilities()
+        glViewport(0, 0, windowWidth, windowHeight)
         // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0.0, windowWidth.toDouble(), 0.0, windowHeight.toDouble(), 1.0, -1.0)
-        glMatrixMode(GL_MODELVIEW)
+        glClearColor(0.2f, 0.5f, 0.8f, 0.0f)
     }
 
     private fun initInputListeners() {

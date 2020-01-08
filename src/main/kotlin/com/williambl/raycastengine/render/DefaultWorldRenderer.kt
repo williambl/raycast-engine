@@ -9,17 +9,63 @@ import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
-import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.GL30
+import org.lwjgl.opengl.GL45.*
 import kotlin.math.abs
-import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.pow
 
 
 class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
 
+    val vbo: IntArray = intArrayOf(1)
+    val vao: IntArray = intArrayOf(1)
+    val ebo: IntArray = intArrayOf(1)
+    var shaderProgram: Int = 0
+
+    init {
+        setupGL()
+    }
+
     override fun tick() {
         render(world, camera)
+    }
+
+    private fun setupGL() {
+        val vertexShader = GL20.glCreateShader(GL20.GL_VERTEX_SHADER)
+        glShaderSource(vertexShader, this::class.java.getResource("/vertex.vs").readText())
+        glCompileShader(vertexShader)
+        val fragShader = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER)
+        glShaderSource(fragShader, this::class.java.getResource("/fragment.fs").readText())
+        glCompileShader(fragShader)
+        shaderProgram = glCreateProgram()
+        glAttachShader(shaderProgram, vertexShader)
+        glAttachShader(shaderProgram, fragShader)
+        glLinkProgram(shaderProgram)
+        glDeleteShader(vertexShader)
+        glDeleteShader(fragShader)
+
+        val vertices = floatArrayOf(
+                -1.0f, -1.0f, 0.0f,
+                -1.0f, 0.0f, 0.0f,
+                1.0f, 0.0f, 0.0f,
+                1.0f, -1.0f, 0.0f
+        )
+        val indices = intArrayOf(
+                0, 1, 2,
+                2, 3, 0
+        )
+        glGenVertexArrays(vao)
+        glCreateBuffers(vbo)
+        glCreateBuffers(ebo)
+        glBindVertexArray(vao[0])
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0])
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0])
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3*4, 0)
+        glEnableVertexAttribArray(0)
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {
@@ -35,35 +81,19 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
 
         renderBackground(context)
 
-        renderWorld(context)
+        //renderWorld(context)
 
-        renderRenderables(context)
+        //renderRenderables(context)
     }
 
     private fun renderBackground(context: RenderingContext) {
-        glPushMatrix()
-        glDisable(GL_TEXTURE_2D)
-        glColor3d(context.world.floorColor.first, context.world.floorColor.second, context.world.floorColor.third)
-        glBegin(GL_QUADS)
-        glVertex2i(0, 0)
-        glVertex2i(context.width, 0)
-        glVertex2i(context.width, context.height/2)
-        glVertex2i(0, context.height/2)
-        glEnd()
-
-        glBegin(GL_QUADS)
-        glColor3d(context.world.skyColor.first, context.world.skyColor.second, context.world.skyColor.third)
-        glVertex2i(0, context.height/2)
-        glVertex2i(context.width, context.height/2)
-        glVertex2i(context.width, context.height)
-        glVertex2i(0, context.height)
-        glEnd()
-
-        glPopMatrix()
-
+        glUseProgram(shaderProgram)
+        glBindVertexArray(vao[0])
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0)
+        GL30.glBindVertexArray(0)
     }
 
-    private fun renderWorld(context: RenderingContext) {
+    /*private fun renderWorld(context: RenderingContext) {
         for (column in 0..context.width) {
             val cameraX = 2 * column / context.width.toDouble() - 1 // X-coord in camera space
 
@@ -179,7 +209,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             glEnd()
             glPopMatrix()
         }
-    }
+    }*/
 
     private fun renderRenderables(context: RenderingContext) {
         val renderables = context.world.getGameObjectsOfType(Renderable::class.java).map { it as Renderable<GameObject> } as ArrayList
