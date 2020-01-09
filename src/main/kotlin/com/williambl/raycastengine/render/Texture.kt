@@ -1,14 +1,19 @@
 package com.williambl.raycastengine.render
 
+import de.matthiasmann.twl.utils.PNGDecoder
+import org.lwjgl.opengl.GL45.*
+import java.io.IOException
+import java.nio.ByteBuffer
+
 
 class Texture(val location: String) {
 
-    private val id: Int = 0
+    private val id: Int
 
-    val width: Int = 0
-    val height: Int = 0
+    val width: Int
+    val height: Int
 
-    init {/*
+    init {
         val decoder = try {
             PNGDecoder(this::class.java.getResourceAsStream(location))
         } catch (e: IOException) {
@@ -27,8 +32,6 @@ class Texture(val location: String) {
             decoder.decode(buffer, width * 4, PNGDecoder.Format.RGBA)
             buffer.flip()
 
-            glEnable(GL_TEXTURE_2D)
-
             id = glGenTextures()
 
             glBindTexture(GL_TEXTURE_2D, id)
@@ -42,7 +45,7 @@ class Texture(val location: String) {
             id = -1
             width = -1
             height = -1
-        }*/
+        }
     }
 
     fun bind() {
@@ -50,6 +53,6 @@ class Texture(val location: String) {
             println("\"$location\" is not a valid texture")
             return
         }
-        //glBindTexture(GL_TEXTURE_2D, id)
+        glBindTexture(GL_TEXTURE_2D, id)
     }
 }
