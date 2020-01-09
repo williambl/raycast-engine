@@ -9,7 +9,6 @@ import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
-import org.lwjgl.opengl.GL11.glGetError
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
@@ -18,6 +17,7 @@ import kotlin.math.pow
 class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
 
     lateinit var floorShape: RenderableShape
+    lateinit var skyShape: RenderableShape
 
     init {
         setupGL()
@@ -30,21 +30,32 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
     private fun setupGL() {
         floorShape = RenderableShape(
                 floatArrayOf(
-                        -1.0f, -1.0f, 0.0f,
-                        -1.0f, 0.0f, 0.0f,
-                        1.0f, 0.0f, 0.0f,
-                        1.0f, -1.0f, 0.0f
+                        -1.0f, -1.0f, 0.0f, world.floorColor.first, world.floorColor.second, world.floorColor.third,
+                        -1.0f, 0.0f, 0.0f,  world.floorColor.first, world.floorColor.second, world.floorColor.third,
+                        1.0f, 0.0f, 0.0f,   world.floorColor.first, world.floorColor.second, world.floorColor.third,
+                        1.0f, -1.0f, 0.0f,  world.floorColor.first, world.floorColor.second, world.floorColor.third
                 ),
                 intArrayOf(
                         0, 1, 2,
                         2, 3, 0
                 ),
-                RenderUtils.createCompleteShaderProgram(
-                        this::class.java.getResource("/vertex.vs").readText(),
-                        this::class.java.getResource("/fragment.fs").readText()
-                )
+                RenderUtils.getAndCompileShaderProgram("flat")
         )
         floorShape.setup()
+        skyShape = RenderableShape(
+                floatArrayOf(
+                        -1.0f, 0.0f, 0.0f, world.skyColor.first, world.skyColor.second, world.skyColor.third,
+                        -1.0f, 1.0f, 0.0f,  world.skyColor.first, world.skyColor.second, world.skyColor.third,
+                        1.0f, 1.0f, 0.0f,   world.skyColor.first, world.skyColor.second, world.skyColor.third,
+                        1.0f, 0.0f, 0.0f,  world.skyColor.first, world.skyColor.second, world.skyColor.third
+                ),
+        intArrayOf(
+                0, 1, 2,
+                2, 3, 0
+        ),
+        RenderUtils.getAndCompileShaderProgram("flat")
+        )
+        skyShape.setup()
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {
@@ -67,7 +78,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
 
     private fun renderBackground(context: RenderingContext) {
         floorShape.render()
-        println(glGetError())
+        skyShape.render()
     }
 
     /*private fun renderWorld(context: RenderingContext) {

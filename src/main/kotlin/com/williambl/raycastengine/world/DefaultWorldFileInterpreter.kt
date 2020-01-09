@@ -13,8 +13,8 @@ class DefaultWorldFileInterpreter: WorldFileInterpreter {
 
         val worldProperties = json.obj("worldProperties")
         if (worldProperties != null) {
-            val floorColor = worldProperties.array<Double>("floorColor")
-            val skyColor = worldProperties.array<Double>("skyColor")
+            val floorColor = worldProperties.array<Float>("floorColor")
+            val skyColor = worldProperties.array<Float>("skyColor")
             if (floorColor != null)
                 world.floorColor = Triple(floorColor[0], floorColor[1], floorColor[2])
             if (skyColor != null)

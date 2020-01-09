@@ -13,8 +13,8 @@ class DefaultWorld(override val map: Array<IntArray>) : World {
     var gameObjects: ArrayList<GameObject> = arrayListOf()
         private set
 
-    var floorColor = Triple(0.0, 0.0, 0.0)
-    var skyColor = Triple(1.0, 1.0, 1.0)
+    var floorColor = Triple(0.0f, 0.0f, 0.0f)
+    var skyColor = Triple(1.0f, 1.0f, 1.0f)
 
     override fun onStart() {}
 
