@@ -9,9 +9,7 @@ import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
-import org.lwjgl.opengl.GL20
-import org.lwjgl.opengl.GL30
-import org.lwjgl.opengl.GL45.*
+import org.lwjgl.opengl.GL11.glGetError
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
@@ -19,10 +17,7 @@ import kotlin.math.pow
 
 class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
 
-    val vbo: IntArray = intArrayOf(1)
-    val vao: IntArray = intArrayOf(1)
-    val ebo: IntArray = intArrayOf(1)
-    var shaderProgram: Int = 0
+    lateinit var floorShape: RenderableShape
 
     init {
         setupGL()
@@ -33,39 +28,23 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
     }
 
     private fun setupGL() {
-        val vertexShader = GL20.glCreateShader(GL20.GL_VERTEX_SHADER)
-        glShaderSource(vertexShader, this::class.java.getResource("/vertex.vs").readText())
-        glCompileShader(vertexShader)
-        val fragShader = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER)
-        glShaderSource(fragShader, this::class.java.getResource("/fragment.fs").readText())
-        glCompileShader(fragShader)
-        shaderProgram = glCreateProgram()
-        glAttachShader(shaderProgram, vertexShader)
-        glAttachShader(shaderProgram, fragShader)
-        glLinkProgram(shaderProgram)
-        glDeleteShader(vertexShader)
-        glDeleteShader(fragShader)
-
-        val vertices = floatArrayOf(
-                -1.0f, -1.0f, 0.0f,
-                -1.0f, 0.0f, 0.0f,
-                1.0f, 0.0f, 0.0f,
-                1.0f, -1.0f, 0.0f
+        floorShape = RenderableShape(
+                floatArrayOf(
+                        -1.0f, -1.0f, 0.0f,
+                        -1.0f, 0.0f, 0.0f,
+                        1.0f, 0.0f, 0.0f,
+                        1.0f, -1.0f, 0.0f
+                ),
+                intArrayOf(
+                        0, 1, 2,
+                        2, 3, 0
+                ),
+                RenderUtils.createCompleteShaderProgram(
+                        this::class.java.getResource("/vertex.vs").readText(),
+                        this::class.java.getResource("/fragment.fs").readText()
+                )
         )
-        val indices = intArrayOf(
-                0, 1, 2,
-                2, 3, 0
-        )
-        glGenVertexArrays(vao)
-        glCreateBuffers(vbo)
-        glCreateBuffers(ebo)
-        glBindVertexArray(vao[0])
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[0])
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0])
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3*4, 0)
-        glEnableVertexAttribArray(0)
+        floorShape.setup()
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {
@@ -87,10 +66,8 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
     }
 
     private fun renderBackground(context: RenderingContext) {
-        glUseProgram(shaderProgram)
-        glBindVertexArray(vao[0])
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0)
-        GL30.glBindVertexArray(0)
+        floorShape.render()
+        println(glGetError())
     }
 
     /*private fun renderWorld(context: RenderingContext) {
