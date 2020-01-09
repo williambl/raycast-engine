@@ -23,9 +23,12 @@ class RenderableShape(val vertices: FloatArray, val indices: IntArray, val shade
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0])
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0)
-
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * 4, 0)
         glEnableVertexAttribArray(0)
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * 4, 3 * 4)
+        glEnableVertexAttribArray(1)
+
     }
 
     fun render() {
