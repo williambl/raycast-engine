@@ -10,14 +10,19 @@ import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.glfwGetWindowSize
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.pow
 
 
 class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
 
-    lateinit var floorShape: RenderableShape
-    lateinit var skyShape: RenderableShape
+    lateinit var floorShape: ColouredRenderableShape
+    lateinit var skyShape: ColouredRenderableShape
+
+    val wallShapes: MutableList<TexturedRenderableShape> = mutableListOf()
+
+    var wallShader: Int = 0
 
     init {
         setupGL()
@@ -28,7 +33,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
     }
 
     private fun setupGL() {
-        floorShape = RenderableShape(
+        floorShape = ColouredRenderableShape(
                 floatArrayOf(
                         -1.0f, -1.0f, 0.0f, world.floorColor.first, world.floorColor.second, world.floorColor.third,
                         -1.0f, 0.0f, 0.0f,  world.floorColor.first, world.floorColor.second, world.floorColor.third,
@@ -42,20 +47,22 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
                 RenderUtils.getAndCompileShaderProgram("flat")
         )
         floorShape.setup()
-        skyShape = RenderableShape(
+        skyShape = ColouredRenderableShape(
                 floatArrayOf(
                         -1.0f, 0.0f, 0.0f, world.skyColor.first, world.skyColor.second, world.skyColor.third,
                         -1.0f, 1.0f, 0.0f,  world.skyColor.first, world.skyColor.second, world.skyColor.third,
                         1.0f, 1.0f, 0.0f,   world.skyColor.first, world.skyColor.second, world.skyColor.third,
                         1.0f, 0.0f, 0.0f,  world.skyColor.first, world.skyColor.second, world.skyColor.third
                 ),
-        intArrayOf(
-                0, 1, 2,
-                2, 3, 0
-        ),
-        RenderUtils.getAndCompileShaderProgram("flat")
+                intArrayOf(
+                        0, 1, 2,
+                        2, 3, 0
+                ),
+                RenderUtils.getAndCompileShaderProgram("flat")
         )
         skyShape.setup()
+
+        wallShader = RenderUtils.getAndCompileShaderProgram("flatTextured")
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {
@@ -71,7 +78,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
 
         renderBackground(context)
 
-        //renderWorld(context)
+        renderWorld(context)
 
         //renderRenderables(context)
     }
@@ -81,7 +88,33 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
         skyShape.render()
     }
 
-    /*private fun renderWorld(context: RenderingContext) {
+    private fun renderWorld(context: RenderingContext) {
+        if (wallShapes.size > context.width) {
+            for (i in wallShapes.size..0) {
+                if (i > context.width) {
+                    wallShapes.removeAt(i)
+                }
+            }
+        } else if (wallShapes.size < context.width) {
+            for (i in 0..(context.width-wallShapes.size)) {
+                wallShapes.add(
+                        TexturedRenderableShape(
+                                floatArrayOf(
+                                        -1f, -1f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+                                        1f, -1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                                        1f, 1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                                        -1f, 1f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+                                ),
+                                intArrayOf(
+                                        0, 1, 2,
+                                        2, 3, 0
+                                ),
+                                wallShader,
+                                world.wallTextures[0]
+                        )
+                )
+            }
+        }
         for (column in 0..context.width) {
             val cameraX = 2 * column / context.width.toDouble() - 1 // X-coord in camera space
 
@@ -161,18 +194,22 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             perpWallDist = if (side == 0) (mapX - camera.x + (1 - stepX) / 2) / rayDirX
             else (mapY - camera.y + (1 - stepY) / 2) / rayDirY
 
-            val lineHeight = (context.height / perpWallDist).toInt()
+            val lineHeight: Float = ((context.height / perpWallDist)/context.height).toFloat()
 
             // Calculate lowest and highest pixel to fill in current column
-            val bottom = (-lineHeight / 2 + context.height / 2)
-            val top = (lineHeight / 2 + context.height / 2)
+            val bottom: Float = -lineHeight / 2
+            val top: Float = lineHeight / 2
+
+            // Calculate the x-coordinate of the column in viewspace
+            val columnXMin: Float = (column/context.width.toFloat())*2f - 1
+            val columnXMax: Float = ((column+1)/context.width.toFloat())*2f - 1
 
             // Calculate which column of texture to use
-            var textureX = if (side == 0) camera.y + perpWallDist * rayDirY
-            else camera.x + perpWallDist * rayDirX
+            var textureX: Float = (if (side == 0) camera.y + perpWallDist * rayDirY
+            else camera.x + perpWallDist * rayDirX).toFloat()
             textureX -= floor((textureX))
 
-            val pixelWidth = 1/world.wallTextures[result].width
+            val pixelWidth: Float = 1/world.wallTextures[result].width.toFloat()
 
             // Work out how light it should be
 
@@ -182,22 +219,20 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             context.zBuffer[column] = perpWallDist
 
             // Draw it
+            val wallShape = wallShapes[column]
 
-            glPushMatrix()
-            glColor3d(brightness.first, brightness.second, brightness.third)
-            glEnable(GL_TEXTURE_2D)
-            world.wallTextures[result].bind()
+             wallShape.vertices = floatArrayOf(
+                            columnXMin, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 1.0f,
+                            columnXMax, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX+pixelWidth, 1.0f,
+                            columnXMax, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX+pixelWidth, 0.0f,
+                            columnXMin, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 0.0f
+                    )
+            wallShape.texture = world.wallTextures[result]
+            wallShape.setup()
+            wallShape.render()
 
-            glBegin(GL_QUADS)
-            glTexCoord2d(textureX, 1.0); glVertex2i(column, bottom)
-            glTexCoord2d(textureX + pixelWidth, 1.0); glVertex2i(column + 1, bottom)
-            glTexCoord2d(textureX + pixelWidth, 0.0); glVertex2i(column + 1, top)
-            glTexCoord2d(textureX, 0.0); glVertex2i(column, top)
-
-            glEnd()
-            glPopMatrix()
         }
-    }*/
+    }
 
     private fun renderRenderables(context: RenderingContext) {
         val renderables = context.world.getGameObjectsOfType(Renderable::class.java).map { it as Renderable<GameObject> } as ArrayList
@@ -212,7 +247,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
         }
     }
 
-    internal fun calculateLighting(world: World, x: Double, y: Double): Triple<Double, Double, Double> {
+    internal fun calculateLighting(world: World, x: Double, y: Double): Triple<Float, Float, Float> {
         var brightnessR = 0.0
         var brightnessG = 0.0
         var brightnessB = 0.0
@@ -227,6 +262,6 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
         brightnessG = min(brightnessG, 1.0)
         brightnessB = min(brightnessB, 1.0)
 
-        return Triple(brightnessR, brightnessG, brightnessB)
+        return Triple(brightnessR.toFloat(), brightnessG.toFloat(), brightnessB.toFloat())
     }
 }
