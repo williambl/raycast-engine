@@ -197,8 +197,8 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             val lineHeight: Float = ((context.height / perpWallDist)/context.height).toFloat()
 
             // Calculate lowest and highest pixel to fill in current column
-            val bottom: Float = -lineHeight / 2
-            val top: Float = lineHeight / 2
+            val bottom: Float = -lineHeight / 1.25f
+            val top: Float = lineHeight / 1.25f
 
             // Calculate the x-coordinate of the column in viewspace
             val columnXMin: Float = (column/context.width.toFloat())*2f - 1
