@@ -80,7 +80,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
 
         renderWorld(context)
 
-        //renderRenderables(context)
+        renderRenderables(context)
     }
 
     private fun renderBackground(context: RenderingContext) {
