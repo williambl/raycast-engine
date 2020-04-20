@@ -153,10 +153,16 @@
       ]
     },
     {
-      "class": "com.williambl.raycastengine.gameobject.MovingSprite",
+      "class": "com.williambl.raycastengine.gameobject.Sprite",
       "constructor": 0,
       "args": [
-        "/face.png",
+        {
+          "class": "com.williambl.raycastengine.render.Texture",
+          "constructor": 0,
+          "args": [
+            "/face.png"
+          ]
+        },
         5.0,
         5.0
       ]

@@ -3,7 +3,6 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
@@ -23,10 +22,6 @@ object Main {
     var windowTitle: String = "Raycaster"
 
     val reflections = Reflections("")
-
-    val gameObjectClasses: Map<String, Class<out GameObject>> = reflections.getSubTypesOf(GameObject::class.java).map {
-        it.name to it
-    }.toMap()
 
     lateinit var world: World
 

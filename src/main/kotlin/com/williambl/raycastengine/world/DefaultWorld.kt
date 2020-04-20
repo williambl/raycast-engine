@@ -1,6 +1,5 @@
 package com.williambl.raycastengine.world
 
-import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.render.Texture
@@ -38,11 +37,5 @@ class DefaultWorld(override val map: Array<IntArray>) : World {
         return gameObjects.filterIsInstance(klass)
     }
 
-    /*
-     * Creates a new gameObject from the classname and arguments. Only works if all the arguments are primitives.
-     */
-    override fun createGameObject(className: String, constructor: Int, vararg args: Any): GameObject? {
-        println(Main.gameObjectClasses[className]?.constructors?.contentToString())
-        return Main.gameObjectClasses[className]?.constructors?.get(constructor)?.newInstance(*args) as GameObject?
-    }
+
 }

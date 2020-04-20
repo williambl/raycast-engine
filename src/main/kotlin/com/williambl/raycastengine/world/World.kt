@@ -13,6 +13,4 @@ interface World: StartupListener, Tickable {
     fun removeGameObject(gameObject: GameObject)
 
     fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T>
-
-    fun createGameObject(className: String, constructor: Int, vararg args: Any): GameObject?
 }
