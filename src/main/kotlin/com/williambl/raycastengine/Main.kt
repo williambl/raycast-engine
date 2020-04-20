@@ -64,12 +64,12 @@ object Main {
 
     private fun cleanup() {
         // Free the window callbacks and destroy the window
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
+        glfwFreeCallbacks(window)
+        glfwDestroyWindow(window)
 
         // Terminate GLFW and free the error callback
-        glfwTerminate();
-        glfwSetErrorCallback(null)?.free();
+        glfwTerminate()
+        glfwSetErrorCallback(null)?.free()
     }
 
     private fun initGLFW() {
@@ -99,6 +99,12 @@ object Main {
         glfwMakeContextCurrent(window)
         // Enable v-sync
         glfwSwapInterval(1)
+
+        glfwSetFramebufferSizeCallback(window) { _, width, height ->
+            glViewport(0, 0, width, height)
+            windowWidth = width
+            windowHeight = height
+        }
 
         // Make the window visible
         glfwShowWindow(window)
