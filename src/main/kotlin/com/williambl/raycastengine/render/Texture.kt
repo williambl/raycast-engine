@@ -1,7 +1,7 @@
 package com.williambl.raycastengine.render
 
 import de.matthiasmann.twl.utils.PNGDecoder
-import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL45.*
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -31,8 +31,6 @@ class Texture(val location: String) {
             val buffer = ByteBuffer.allocateDirect(4 * width * height)
             decoder.decode(buffer, width * 4, PNGDecoder.Format.RGBA)
             buffer.flip()
-
-            glEnable(GL_TEXTURE_2D)
 
             id = glGenTextures()
 
