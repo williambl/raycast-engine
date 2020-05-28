@@ -5,6 +5,7 @@ import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Camera
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Light
+import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.world.World
 import org.lwjgl.BufferUtils
@@ -121,95 +122,27 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             val rayDirX = camera.dir.first + camera.plane.first * cameraX
             val rayDirY = camera.dir.second + camera.plane.second * cameraX
 
-            // Coords of current square
-            var mapX = camera.x.toInt()
-            var mapY = camera.y.toInt()
+            val raytraceResult = world.rayTrace(rayDirX, rayDirY, camera.x, camera.y)
+            val perpWallDist = raytraceResult.perpWallDist
+            val side = raytraceResult.side
+            val result = raytraceResult.result as RaytraceResult.TileRaytraceResultType
 
-            // Length of ray from current position to next X or Y wall
-            // https://lodev.org/cgtutor/images/raycastdelta.gif
-            var sideDistX: Double
-            var sideDistY: Double
-
-            // Length of ray from one side to next in map
-            val deltaDistX = abs(1 / rayDirX)
-            val deltaDistY = abs(1 / rayDirY)
-            var perpWallDist: Double
-
-            // Direction to go in X and Y
-            var stepX: Int
-            var stepY: Int
-
-            var result = 0 // Result of raycast
-            var side = 0 // Was the wall N-S or E-W
-
-            // Calculate vector to next square
-            if (rayDirX < 0)
-            {
-                stepX = -1
-                sideDistX = (camera.x - mapX) * deltaDistX
-            }
-            else
-            {
-                stepX = 1
-                sideDistX = (mapX + 1.0 - camera.x) * deltaDistX
-            }
-            if (rayDirY < 0)
-            {
-                stepY = -1
-                sideDistY = (camera.y - mapY) * deltaDistY
-            }
-            else
-            {
-                stepY = 1
-                sideDistY = (mapY + 1.0 - camera.y) * deltaDistY
-            }
-
-            // Loop to find where the ray hits a wall
-            while(result == 0) {
-
-                // Jump to next square
-                if (sideDistX < sideDistY)
-                {
-                    sideDistX += deltaDistX
-                    mapX += stepX
-                    side = 0
-                }
-                else
-                {
-                    sideDistY += deltaDistY
-                    mapY += stepY
-                    side = 1
-                }
-
-                // Check if ray has hit a wall
-                result = try {
-                    world.map[mapX][mapY]
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    0
-                    break
-                }
-            }
-
-            // Calculate distance from camera plane to wall
-            perpWallDist = if (side == 0) (mapX - camera.x + (1 - stepX) / 2) / rayDirX
-            else (mapY - camera.y + (1 - stepY) / 2) / rayDirY
-
-            val lineHeight: Float = ((context.height / perpWallDist)/context.height).toFloat()
+            val lineHeight: Float = ((context.height / perpWallDist) / context.height).toFloat()
 
             // Calculate lowest and highest pixel to fill in current column
             val bottom: Float = -lineHeight / 1.25f
             val top: Float = lineHeight / 1.25f
 
             // Calculate the x-coordinate of the column in viewspace
-            val columnXMin: Float = (column/context.width.toFloat())*2f - 1
-            val columnXMax: Float = ((column+1)/context.width.toFloat())*2f - 1
+            val columnXMin: Float = (column / context.width.toFloat()) * 2f - 1
+            val columnXMax: Float = ((column + 1) / context.width.toFloat()) * 2f - 1
 
             // Calculate which column of texture to use
-            var textureX: Float = (if (side == 0) camera.y + perpWallDist * rayDirY
+            var textureX: Float = (if (side == RaytraceResult.RaytraceSide.NORTHSOUTH) camera.y + perpWallDist * rayDirY
             else camera.x + perpWallDist * rayDirX).toFloat()
             textureX -= floor((textureX))
 
-            val pixelWidth: Float = 1/world.wallTextures[result].width.toFloat()
+            val pixelWidth: Float = 1 / world.wallTextures[result.result].width.toFloat()
 
             // Work out how light it should be
 
@@ -221,13 +154,13 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
             // Draw it
             val wallShape = wallShapes[column]
 
-             wallShape.vertices = floatArrayOf(
-                            columnXMin, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 1.0f,
-                            columnXMax, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX+pixelWidth, 1.0f,
-                            columnXMax, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX+pixelWidth, 0.0f,
-                            columnXMin, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 0.0f
-                    )
-            wallShape.texture = world.wallTextures[result]
+            wallShape.vertices = floatArrayOf(
+                    columnXMin, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 1.0f,
+                    columnXMax, bottom, 0.0f, brightness.first, brightness.second, brightness.third, textureX + pixelWidth, 1.0f,
+                    columnXMax, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX + pixelWidth, 0.0f,
+                    columnXMin, top, 0.0f, brightness.first, brightness.second, brightness.third, textureX, 0.0f
+            )
+            wallShape.texture = world.wallTextures[result.result]
             wallShape.setup()
             wallShape.render()
 
