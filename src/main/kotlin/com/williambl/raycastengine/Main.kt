@@ -3,6 +3,7 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks

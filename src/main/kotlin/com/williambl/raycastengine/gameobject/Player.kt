@@ -13,14 +13,16 @@ class Player(x: Double, y: Double) : Camera(x, y), Tickable {
     val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
 
     override fun tick() {
-        if (Main.inputManager.shouldGoForward)
+        if (Main.inputManager.isPressed("forward"))
             forward()
-        if (Main.inputManager.shouldGoBackward)
+        if (Main.inputManager.isPressed("backward"))
             backward()
-        if (Main.inputManager.shouldGoLeft)
+        if (Main.inputManager.isPressed("left"))
             left()
-        if (Main.inputManager.shouldGoRight)
+        if (Main.inputManager.isPressed("right"))
             right()
+        if (Main.inputManager.isPressed("interact"))
+            interact()
 
         worldRenderer.tick()
     }
@@ -60,5 +62,9 @@ class Player(x: Double, y: Double) : Camera(x, y), Tickable {
         val planeX = plane.first * cos(-rotSpeed) - plane.second * sin(-rotSpeed)
         val planeY = plane.first * sin(-rotSpeed) + plane.second * cos(-rotSpeed)
         plane = Pair(planeX, planeY)
+    }
+
+    private fun interact() {
+
     }
 }
