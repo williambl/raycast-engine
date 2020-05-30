@@ -1,6 +1,7 @@
 package com.williambl.raycastengine.world
 
 import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
+import com.williambl.raycastengine.collision.CollisionProvider
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
@@ -46,7 +47,7 @@ interface World: StartupListener, Tickable {
         val stepY: Int
 
         var tileResult = 0 // Result of raycast
-        var collidableResult: AxisAlignedBoundingBox? = null // Result of raycast
+        val aabbResult = mutableListOf<AxisAlignedBoundingBox>() // Result of raycast
         var side = RaytraceResult.RaytraceSide.NORTHSOUTH // Was the wall N-S or E-W
 
         // Calculate vector to next square
@@ -66,7 +67,7 @@ interface World: StartupListener, Tickable {
         }
 
         // Loop to find where the ray hits a wall
-        while (tileResult == 0) {
+        while (tileResult == 0 && aabbResult.isEmpty()) {
             // Jump to next square
             if (sideDistX < sideDistY) {
                 sideDistX += deltaDistX
@@ -87,7 +88,9 @@ interface World: StartupListener, Tickable {
                 }
             }
             if (mode.matches(RaytraceMode.AABBS)) {
-                //TODO
+                if (this is CollisionProvider) {
+                    aabbResult.addAll(this.getAABBsAt(x.toDouble(), y.toDouble()))
+                }
             }
         }
 
@@ -97,8 +100,8 @@ interface World: StartupListener, Tickable {
 
         return RaytraceResult(
                 x, y, perpWallDist, side,
-                if (collidableResult != null)
-                    RaytraceResult.AABBRaytraceResultType(collidableResult)
+                if (aabbResult.isNotEmpty())
+                    RaytraceResult.AABBRaytraceResultType(aabbResult)
                 else
                     RaytraceResult.TileRaytraceResultType(tileResult)
         )

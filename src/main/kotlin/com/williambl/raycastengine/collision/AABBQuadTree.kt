@@ -1,6 +1,8 @@
 package com.williambl.raycastengine.collision
 
-class AABBQuadTree(minX: Double, minY: Double, maxX: Double, maxY: Double) : AxisAlignedBoundingBox(minX, minY, maxX, maxY), MutableSet<AxisAlignedBoundingBox> {
+import com.williambl.raycastengine.util.math.Vec2d
+
+class AABBQuadTree(minX: Double, minY: Double, maxX: Double, maxY: Double) : AxisAlignedBoundingBox(minX, minY, maxX, maxY, null), MutableSet<AxisAlignedBoundingBox> {
 
     companion object {
         private const val maxColliders = 8
@@ -80,6 +82,18 @@ class AABBQuadTree(minX: Double, minY: Double, maxX: Double, maxY: Double) : Axi
             elements.addAll(child.allElements())
         }
         return elements
+    }
+
+    operator fun get(index: Vec2d): List<AxisAlignedBoundingBox> {
+        val quadrant = childTrees.first { it.collidesWith(index) }[index].toMutableList()
+        quadrant.addAll(colliders.filter { it.collidesWith(index) })
+        return quadrant.toList()
+    }
+
+    operator fun get(x: Double, y: Double): List<AxisAlignedBoundingBox> {
+        val quadrant = childTrees.first { it.collidesWith(x, y) }[x, y].toMutableList()
+        quadrant.addAll(colliders.filter { it.collidesWith(x, y) })
+        return quadrant.toList()
     }
 
     private fun reallocateColliders() {

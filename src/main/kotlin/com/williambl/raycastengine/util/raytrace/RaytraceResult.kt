@@ -11,5 +11,5 @@ data class RaytraceResult<T : RaytraceResult.RaytraceResultType<out Any>>(val x:
 
     abstract class RaytraceResultType<T>(val result: T)
     class TileRaytraceResultType(result: Int) : RaytraceResultType<Int>(result)
-    class AABBRaytraceResultType(result: AxisAlignedBoundingBox) : RaytraceResultType<AxisAlignedBoundingBox>(result)
+    class AABBRaytraceResultType(result: List<AxisAlignedBoundingBox>) : RaytraceResultType<List<AxisAlignedBoundingBox>>(result)
 }
