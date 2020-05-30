@@ -1,8 +1,8 @@
 package com.williambl.raycastengine.world
 
+import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.util.math.Vec2d
 import com.williambl.raycastengine.util.raytrace.RaytraceMode
@@ -46,7 +46,7 @@ interface World: StartupListener, Tickable {
         val stepY: Int
 
         var tileResult = 0 // Result of raycast
-        var collidableResult: Collidable? = null // Result of raycast
+        var collidableResult: AxisAlignedBoundingBox? = null // Result of raycast
         var side = RaytraceResult.RaytraceSide.NORTHSOUTH // Was the wall N-S or E-W
 
         // Calculate vector to next square
@@ -86,7 +86,7 @@ interface World: StartupListener, Tickable {
                     break
                 }
             }
-            if (mode.matches(RaytraceMode.COLLIDERS)) {
+            if (mode.matches(RaytraceMode.AABBS)) {
                 //TODO
             }
         }
@@ -98,7 +98,7 @@ interface World: StartupListener, Tickable {
         return RaytraceResult(
                 x, y, perpWallDist, side,
                 if (collidableResult != null)
-                    RaytraceResult.ColliderRaytraceResultType(collidableResult)
+                    RaytraceResult.AABBRaytraceResultType(collidableResult)
                 else
                     RaytraceResult.TileRaytraceResultType(tileResult)
         )

@@ -1,6 +1,6 @@
 package com.williambl.raycastengine.util.raytrace
 
-import com.williambl.raycastengine.gameobject.Collidable
+import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
 
 data class RaytraceResult<T : RaytraceResult.RaytraceResultType<out Any>>(val x: Int, val y: Int, val perpWallDist: Double, val side: RaytraceSide, val result: T) {
 
@@ -11,5 +11,5 @@ data class RaytraceResult<T : RaytraceResult.RaytraceResultType<out Any>>(val x:
 
     abstract class RaytraceResultType<T>(val result: T)
     class TileRaytraceResultType(result: Int) : RaytraceResultType<Int>(result)
-    class ColliderRaytraceResultType(result: Collidable) : RaytraceResultType<Collidable>(result)
+    class AABBRaytraceResultType(result: AxisAlignedBoundingBox) : RaytraceResultType<AxisAlignedBoundingBox>(result)
 }
