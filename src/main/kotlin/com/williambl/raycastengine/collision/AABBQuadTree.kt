@@ -85,13 +85,13 @@ class AABBQuadTree(minX: Double, minY: Double, maxX: Double, maxY: Double) : Axi
     }
 
     operator fun get(index: Vec2d): List<AxisAlignedBoundingBox> {
-        val quadrant = childTrees.first { it.collidesWith(index) }[index].toMutableList()
+        val quadrant = childTrees.firstOrNull { it.collidesWith(index) }?.get(index)?.toMutableList() ?: mutableListOf()
         quadrant.addAll(colliders.filter { it.collidesWith(index) })
         return quadrant.toList()
     }
 
     operator fun get(x: Double, y: Double): List<AxisAlignedBoundingBox> {
-        val quadrant = childTrees.first { it.collidesWith(x, y) }[x, y].toMutableList()
+        val quadrant = childTrees.firstOrNull { it.collidesWith(x, y) }?.get(x, y)?.toMutableList() ?: mutableListOf()
         quadrant.addAll(colliders.filter { it.collidesWith(x, y) })
         return quadrant.toList()
     }

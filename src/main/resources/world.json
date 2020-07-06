@@ -153,7 +153,7 @@
       ]
     },
     {
-      "class": "com.williambl.raycastengine.gameobject.MovingSprite",
+      "class": "com.williambl.raycastengine.gameobject.InteractableSprite",
       "constructor": 0,
       "args": [
         {

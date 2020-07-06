@@ -3,6 +3,8 @@ package com.williambl.raycastengine.gameobject
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.render.DefaultWorldRenderer
+import com.williambl.raycastengine.util.raytrace.RaytraceModeType
+import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
 import kotlin.math.cos
 import kotlin.math.sin
@@ -64,7 +66,14 @@ class Player(x: Double, y: Double) : Camera(x, y), Tickable {
         plane = Pair(planeX, planeY)
     }
 
-    private fun interact() {
+    val raytraceMode = RaytraceModeType.AABBS.and(RaytraceModeType.TILES)
 
+    private fun interact() {
+        val result = world.rayTrace(dir.first, dir.second, x, y, raytraceMode)
+        when (result.result) {
+            is RaytraceResult.AABBRaytraceResultType -> result.result.result
+            is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(result.x.toDouble() + 0.5, result.y.toDouble() + 0.5)
+            else -> listOf()
+        }.filter { it.owner is Interactable }.forEach { (it.owner as Interactable).interact(this, result) }
     }
 }

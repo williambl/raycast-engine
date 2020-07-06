@@ -7,6 +7,7 @@ class SpriteRenderer {
     lateinit var renderableShape: TexturedRenderableShape
 
 
+    //TODO: work out why this renders a little off from certain directions
     fun render(sprite: Sprite, context: RenderingContext) {
         if (!this::renderableShape.isInitialized) {
             renderableShape = TexturedRenderableShape(
