@@ -98,4 +98,10 @@ dependencies {
     runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
 }
 
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
+    }
+}
+
 

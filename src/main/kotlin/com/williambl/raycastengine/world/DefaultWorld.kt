@@ -15,6 +15,9 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
     var gameObjects: ArrayList<GameObject> = arrayListOf()
         private set
 
+    val gameObjectsToAdd = mutableListOf<GameObject>()
+    val gameObjectsToRemove = mutableListOf<GameObject>()
+
     var floorColor = Triple(0.0f, 0.0f, 0.0f)
     var skyColor = Triple(1.0f, 1.0f, 1.0f)
 
@@ -27,17 +30,22 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
             if (it is Tickable)
                 it.tick()
         }
+        gameObjects.addAll(gameObjectsToAdd)
+        gameObjectsToAdd.clear()
+
+        gameObjects.removeAll(gameObjectsToRemove)
+        gameObjectsToRemove.clear()
     }
 
     override fun addGameObject(gameObject: GameObject) {
         gameObject.world = this
-        gameObjects.add(gameObject)
+        gameObjectsToAdd.add(gameObject)
         if (gameObject is Collidable)
             addAABB(gameObject.getAABB())
     }
 
     override fun removeGameObject(gameObject: GameObject) {
-        gameObjects.remove(gameObject)
+        gameObjectsToRemove.add(gameObject)
         if (gameObject is Collidable)
             removeAABB(gameObject.getAABB())
     }

@@ -3,6 +3,7 @@ package com.williambl.raycastengine.world
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.gameobject.GameObject
+import com.williambl.raycastengine.getObjectFromJson
 import com.williambl.raycastengine.render.Texture
 
 class DefaultWorldFileInterpreter: WorldFileInterpreter {
@@ -26,6 +27,7 @@ class DefaultWorldFileInterpreter: WorldFileInterpreter {
             Texture(it)
         }.toTypedArray()
 
+        //TODO: change this so it works out ctor itself
         val gameObjects = json.array<JsonObject>("gameObjects")
         if (gameObjects != null) {
             for (gameObjectRepresentation in gameObjects) {
@@ -43,20 +45,4 @@ class DefaultWorldFileInterpreter: WorldFileInterpreter {
         return world
     }
 
-    /*
-     * Creates a new object from the classname and arguments.
-     */
-    fun createObject(className: String, constructor: Int, vararg args: Any): Any? {
-        return Class.forName(className).constructors[constructor]?.newInstance(*args)
-    }
-
-    fun getObjectFromJson(jsonObject: JsonObject): Any? {
-        val args = jsonObject.array<Any>("args")
-        return createObject(
-                jsonObject.string("class")!!,
-                jsonObject.int("constructor") ?: 0,
-                *(args?.map { if (it is JsonObject) getObjectFromJson(it) else it }?.filterNotNull()?.toTypedArray()
-                        ?: arrayOf())
-        )
-    }
 }
