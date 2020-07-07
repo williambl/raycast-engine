@@ -12,6 +12,8 @@ open class GameObject(var x: Double = 0.0, var y: Double = 0.0) {
 
     open var id: UUID = UUID.randomUUID()
 
+    var isDirty = false
+
     open fun toBytes(byteBuf: ByteBuf) {
         byteBuf.writeUUID(id)
         byteBuf.writeDouble(x)

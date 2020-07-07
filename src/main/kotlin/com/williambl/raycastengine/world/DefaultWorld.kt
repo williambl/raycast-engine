@@ -1,11 +1,13 @@
 package com.williambl.raycastengine.world
 
+import com.williambl.raycastengine.ServerNetworkManager
 import com.williambl.raycastengine.collision.AABBQuadTree
 import com.williambl.raycastengine.collision.CollisionProvider
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.render.Texture
+import io.netty.buffer.Unpooled
 
 
 class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider {
@@ -21,6 +23,8 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
     var floorColor = Triple(0.0f, 0.0f, 0.0f)
     var skyColor = Triple(1.0f, 1.0f, 1.0f)
 
+    override var isClient: Boolean = false
+
     override val quadTree: AABBQuadTree = AABBQuadTree()
 
     override fun onStart() {}
@@ -35,6 +39,16 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
         gameObjects.removeAll(gameObjectsToRemove)
         gameObjectsToRemove.clear()
+
+        if (!isClient) {
+            gameObjects.forEach {
+                if (it.isDirty) {
+                    val buf = Unpooled.buffer()
+                    it.toBytes(buf)
+                    ServerNetworkManager.sendPacketToAll("gameObjectUpdate", buf)
+                }
+            }
+        }
     }
 
     override fun addGameObject(gameObject: GameObject) {

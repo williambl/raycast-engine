@@ -3,12 +3,14 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.GameObject
+import com.williambl.raycastengine.gameobject.ServerPlayer
 import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.input.InputManager
-import com.williambl.raycastengine.render.Texture
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import io.netty.bootstrap.ServerBootstrap
+import io.netty.buffer.Unpooled
 import io.netty.channel.Channel
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
@@ -74,21 +76,30 @@ object Main {
     }
 
     private fun initServer(port: Int) {
-        ServerNetworkManager.addPacketCallback("login") { buf ->
+        ServerNetworkManager.addPacketCallback("login") { packet ->
+            val buf = packet.buf
             val id = buf.readUUID()
+            ServerNetworkManager.channels[id] = packet.ctx.channel()
             queuedWork.add(Runnable {
-                val player = Sprite(Texture("/brick.png"))
+                val player = ServerPlayer()
                 player.id = id
                 world.addGameObject(player)
-                println("oh hai mark")
             })
+
+            val rsp = Unpooled.buffer()
+            rsp.write2DIntArray(world.map)
+            world.getGameObjectsOfType(GameObject::class.java).forEach {
+                it.toBytes(rsp)
+            }
+            ServerNetworkManager.sendPacketToClient("sync", rsp, id)
         }
-        ServerNetworkManager.addPacketCallback("move") { buf ->
+        ServerNetworkManager.addPacketCallback("move") { packet ->
+            val buf = packet.buf
             val id = buf.readUUID()
-            val player: Sprite = world.getGameObjectsOfType<Sprite>(Sprite::class.java).firstOrNull { it.id == id }
+            val player: Sprite = world.getGameObjectsOfType(Sprite::class.java).firstOrNull { it.id == id }
                     ?: return@addPacketCallback
-            player.x = buf.readInt().toDouble()
-            player.y = buf.readInt().toDouble()
+            player.x = buf.readDouble()
+            player.y = buf.readDouble()
         }
         thread {
             val bossGroup = NioEventLoopGroup()

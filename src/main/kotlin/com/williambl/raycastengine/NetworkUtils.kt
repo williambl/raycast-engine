@@ -73,3 +73,21 @@ fun ByteBuf.readGameObject(): GameObject {
     gameObject.fromBytes(this)
     return gameObject
 }
+
+fun ByteBuf.writeIntArray(array: IntArray) {
+    writeInt(array.size)
+    array.forEach { writeInt(it) }
+}
+
+fun ByteBuf.readIntArray(): IntArray {
+    return IntArray(readInt()) { readInt() }
+}
+
+fun ByteBuf.write2DIntArray(array: Array<IntArray>) {
+    writeInt(array.size)
+    array.forEach { writeIntArray(it) }
+}
+
+fun ByteBuf.read2DIntArray(): Array<IntArray> {
+    return Array(readInt()) { readIntArray() }
+}

@@ -15,6 +15,8 @@ interface World: StartupListener, Tickable {
 
     val map: Array<IntArray>
 
+    var isClient: Boolean
+
     fun addGameObject(gameObject: GameObject)
 
     fun removeGameObject(gameObject: GameObject)

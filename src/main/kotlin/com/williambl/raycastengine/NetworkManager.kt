@@ -1,11 +1,13 @@
 package com.williambl.raycastengine
 
 import io.netty.buffer.ByteBuf
+import java.util.*
 
 interface NetworkManager {
 
-    fun addPacketCallback(id: String, callback: (ByteBuf) -> Unit)
+    fun addPacketCallback(id: String, callback: (Packet) -> Unit)
 
-    fun sendPacket(id: String, data: ByteBuf)
-    fun recievePacket(id: String, data: ByteBuf)
+    fun sendPacketToAll(id: String, data: ByteBuf)
+    fun sendPacketToClient(id: String, data: ByteBuf, playerId: UUID)
+    fun receivePacket(id: String, packet: Packet)
 }
