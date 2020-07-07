@@ -10,7 +10,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(x: Double = 0.0, y: Double = 0.0) : Camera(x, y), Tickable {
+open class Player(x: Double = 0.0, y: Double = 0.0) : Camera(x, y), Tickable {
 
     val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
 

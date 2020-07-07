@@ -169,7 +169,7 @@
     },
     {
       "class": "com.williambl.raycastengine.gameobject.Player",
-      "constructor": 0,
+      "constructor": 1,
       "args": [
         2.0,
         2.0
