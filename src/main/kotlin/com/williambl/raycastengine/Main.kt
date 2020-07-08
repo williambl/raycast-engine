@@ -4,7 +4,7 @@ import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
-import com.williambl.raycastengine.gameobject.ServerPlayer
+import com.williambl.raycastengine.gameobject.RemotePlayer
 import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.world.World
@@ -81,17 +81,17 @@ object Main {
             val id = buf.readUUID()
             ServerNetworkManager.channels[id] = packet.ctx.channel()
             queuedWork.add(Runnable {
-                val player = ServerPlayer()
+                val player = RemotePlayer()
                 player.id = id
                 world.addGameObject(player)
-            })
 
-            val rsp = Unpooled.buffer()
-            rsp.write2DIntArray(world.map)
-            world.getGameObjectsOfType(GameObject::class.java).forEach {
-                it.toBytes(rsp)
-            }
-            ServerNetworkManager.sendPacketToClient("sync", rsp, id)
+                val rsp = Unpooled.buffer()
+                rsp.write2DIntArray(world.map)
+                world.getGameObjectsOfType(GameObject::class.java).forEach {
+                    it.toBytes(rsp)
+                }
+                ServerNetworkManager.sendPacketToClient("sync", rsp, id)
+            })
         }
         ServerNetworkManager.addPacketCallback("move") { packet ->
             val buf = packet.buf
