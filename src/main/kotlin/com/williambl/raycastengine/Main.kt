@@ -3,9 +3,23 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.GameObject
+import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
+import com.williambl.raycastengine.world.DefaultWorldFileInterpreter
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
+import io.netty.bootstrap.Bootstrap
+import io.netty.bootstrap.ServerBootstrap
+import io.netty.buffer.Unpooled
+import io.netty.channel.Channel
+import io.netty.channel.ChannelInitializer
+import io.netty.channel.ChannelOption
+import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.channel.socket.nio.NioSocketChannel
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import io.netty.handler.codec.LengthFieldPrepender
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -13,8 +27,11 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
 import org.reflections.Reflections
+import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.concurrent.thread
 
-
+//TODO: decouple ticks from frames
 object Main {
 
     var window: Long = 0
@@ -36,6 +53,10 @@ object Main {
 
     var startupListeners: ArrayList<StartupListener> = arrayListOf()
 
+    val queuedWork: Queue<Runnable> = ConcurrentLinkedQueue<Runnable>()
+
+    val myId = UUID.randomUUID()
+
     @JvmStatic
     fun main(args: Array<String>) {
         init(args)
@@ -51,11 +72,119 @@ object Main {
         initGLFW()
         initGL()
 
+        //TODO: change this if client, only create world when ready to avoid that overwrite
         world = WorldLoader(args.getOrElse(0) { "/world.json" }).load()
         tickables.add(world)
         startupListeners.add(world)
         initInputListeners()
         initStartupListeners()
+
+        if (args.contains("--client"))
+            initClient(8080, args.getOrElse(args.indexOf("--address") + 1) { "localhost" })
+        else
+            initServer(8080)
+    }
+
+    private fun initServer(port: Int) {
+        //TODO: move these
+        ServerNetworkManager.addPacketCallback("login") { packet ->
+            val buf = packet.buf
+            val id = buf.readUUID()
+            ServerNetworkManager.channels[id] = packet.ctx.channel()
+            queuedWork.add(Runnable {
+                val player = Player()
+                player.id = id
+                player.x = 3.0
+                player.y = 3.0
+                world.addGameObject(player)
+
+                val rsp = Unpooled.buffer()
+                world.toBytes(rsp)
+
+                ServerNetworkManager.sendPacketToClient("fullSync", rsp, id)
+            })
+        }
+        ServerNetworkManager.addPacketCallback("move") { packet ->
+            val buf = packet.buf
+            val id = packet.getId()
+            val player = world.getGameObjectsOfType(Player::class.java).firstOrNull { it.id == id }
+                    ?: return@addPacketCallback
+            player.setPos(buf.readDouble(), buf.readDouble())
+            player.dir = buf.readDoublePair()
+            player.plane = buf.readDoublePair()
+        }
+        thread {
+            val bossGroup = NioEventLoopGroup()
+            val workerGroup = NioEventLoopGroup()
+            try {
+                val future = ServerBootstrap()
+                        .group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel::class.java)
+                        .childHandler(object : ChannelInitializer<Channel>() {
+                            override fun initChannel(ch: Channel) {
+                                ch.pipeline().addLast(LengthFieldBasedFrameDecoder(8192, 0, 4, 0, 4))
+                                ch.pipeline().addLast(LengthFieldPrepender(4))
+                                ch.pipeline().addLast(ServerNetworkManager.get())
+                            }
+                        })
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true)
+                        .bind(port)
+                        .sync()
+
+                future.channel().closeFuture().sync()
+            } finally {
+                workerGroup.shutdownGracefully()
+                bossGroup.shutdownGracefully()
+            }
+        }
+    }
+
+    private fun initClient(port: Int, address: String) {
+        //TODO: move these, too
+        ClientNetworkManager.addPacketCallback("fullSync") { packet ->
+            val buf = packet.buf.copy()
+            queuedWork.offer(Runnable {
+                tickables.remove(world)
+                startupListeners.remove(world)
+                //TODO: don't rely on default
+                world = DefaultWorldFileInterpreter().fromBytes(buf)
+                world.isClient = true
+                tickables.add(world)
+                startupListeners.add(world)
+                buf.release()
+            })
+        }
+        ClientNetworkManager.addPacketCallback("sync") { packet ->
+            val id = packet.buf.readUUID()
+            packet.buf.readerIndex(0)
+            world.getGameObjectsOfType(GameObject::class.java).forEach {
+                if (it.id == id)
+                    it.fromBytes(packet.buf)
+            }
+        }
+        thread {
+            val workerGroup = NioEventLoopGroup()
+            try {
+                val future = Bootstrap()
+                        .group(workerGroup)
+                        .channel(NioSocketChannel::class.java)
+                        .handler(object : ChannelInitializer<Channel>() {
+                            override fun initChannel(ch: Channel) {
+                                ch.pipeline().addLast(LengthFieldBasedFrameDecoder(8192, 0, 4, 0, 4))
+                                ch.pipeline().addLast(LengthFieldPrepender(4))
+                                ch.pipeline().addLast(ClientNetworkManager)
+                            }
+                        })
+                        .option(ChannelOption.SO_KEEPALIVE, true)
+                        .connect(address, port)
+                        .sync()
+
+                future.channel().closeFuture().sync()
+            } finally {
+                workerGroup.shutdownGracefully()
+            }
+        }
     }
 
     private fun cleanup() {
@@ -140,6 +269,11 @@ object Main {
         glfwPollEvents()
 
         tickTickables()
+
+        do {
+            val runnable = queuedWork.poll()
+            runnable?.run()
+        } while (runnable != null)
 
         // Swap the color buffers
         glfwSwapBuffers(window)

@@ -54,6 +54,8 @@ dependencies {
 
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.50.Final'
+
     implementation 'com.beust:klaxon:5.0.1'
 
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
@@ -94,6 +96,12 @@ dependencies {
     runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
     runtime "org.lwjgl:lwjgl-tinyfd:${lwjglVersion}:${lwjglNatives}"
     runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
+    }
 }
 
 

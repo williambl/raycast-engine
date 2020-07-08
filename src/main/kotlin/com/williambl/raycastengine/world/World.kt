@@ -7,12 +7,17 @@ import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.util.math.Vec2d
 import com.williambl.raycastengine.util.raytrace.RaytraceMode
+import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
+import io.netty.buffer.ByteBuf
+import java.util.*
 import kotlin.math.abs
 
 interface World: StartupListener, Tickable {
 
     val map: Array<IntArray>
+
+    var isClient: Boolean
 
     fun addGameObject(gameObject: GameObject)
 
@@ -20,16 +25,18 @@ interface World: StartupListener, Tickable {
 
     fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T>
 
+    fun toBytes(buf: ByteBuf, destinationId: UUID? = null)
+
     fun isTileAir(x: Int, y: Int): Boolean {
         return map[x][y] == 0
     }
 
-    fun rayTrace(from: Vec2d, vec: Vec2d, mode: RaytraceMode = RaytraceMode.TILES): RaytraceResult<*> {
+    fun rayTrace(from: Vec2d, vec: Vec2d, mode: RaytraceMode = RaytraceModeType.TILES): RaytraceResult<*> {
         val dir = vec.normalised()
         return rayTrace(dir.x, dir.y, from.x, from.y, mode)
     }
 
-    fun rayTrace(rayDirX: Double, rayDirY: Double, fromX: Double, fromY: Double, mode: RaytraceMode = RaytraceMode.TILES): RaytraceResult<*> {
+    fun rayTrace(rayDirX: Double, rayDirY: Double, fromX: Double, fromY: Double, mode: RaytraceMode = RaytraceModeType.TILES): RaytraceResult<*> {
         var x = fromX.toInt()
         var y = fromY.toInt()
 
@@ -80,14 +87,19 @@ interface World: StartupListener, Tickable {
             }
 
             // Check if ray has hit a wall
-            if (mode.matches(RaytraceMode.TILES)) {
+            if (mode.matches(RaytraceModeType.TILES)) {
                 try {
                     tileResult = this.map[x][y]
                 } catch (e: ArrayIndexOutOfBoundsException) {
                     break
                 }
             }
-            if (mode.matches(RaytraceMode.AABBS)) {
+            if (mode.matches(RaytraceModeType.AABBS)) {
+                try {
+                    this.map[x][y]
+                } catch (e: ArrayIndexOutOfBoundsException) {
+                    break
+                }
                 if (this is CollisionProvider) {
                     aabbResult.addAll(this.getAABBsAt(x.toDouble(), y.toDouble()))
                 }

@@ -134,7 +134,7 @@
   "gameObjects": [
     {
       "class": "com.williambl.raycastengine.gameobject.Light",
-      "constructor": 1,
+      "constructor": 2,
       "args": [
         2.0,
         2.0,
@@ -145,7 +145,7 @@
     },
     {
       "class": "com.williambl.raycastengine.gameobject.Light",
-      "constructor": 0,
+      "constructor": 1,
       "args": [
         7.0,
         8.0,
@@ -153,25 +153,12 @@
       ]
     },
     {
-      "class": "com.williambl.raycastengine.gameobject.MovingSprite",
+      "class": "com.williambl.raycastengine.gameobject.Player",
       "constructor": 0,
       "args": [
-        {
-          "class": "com.williambl.raycastengine.render.Texture",
-          "constructor": 0,
-          "args": [
-            "/face.png"
-          ]
-        },
-        5.0,
-        5.0
-      ]
-    },
-    {
-      "class": "com.williambl.raycastengine.gameobject.Player",
-      "args": [
         2.0,
-        2.0
+        2.0,
+        true
       ]
     }
   ]
