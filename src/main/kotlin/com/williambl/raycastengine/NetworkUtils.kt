@@ -28,6 +28,13 @@ fun ByteBuf.toByteArray(): ByteArray {
     }
 }
 
+fun ByteBuf.writeStrings(collection: Collection<String>) {
+    writeInt(collection.size)
+    collection.forEach { writeString(it) }
+}
+
+fun ByteBuf.readStrings(): Array<String> = Array(readInt()) { readString() }
+
 fun ByteBuf.writeUUID(uuid: UUID): ByteBuf = writeString(uuid.toString())
 
 fun ByteBuf.readUUID() = UUID.fromString(readString())
@@ -48,6 +55,15 @@ fun ByteBuf.writeDoubleTriple(triple: Triple<Double, Double, Double>): ByteBuf {
 }
 
 fun ByteBuf.readDoubleTriple(): Triple<Double, Double, Double> = Triple(readDouble(), readDouble(), readDouble())
+
+fun ByteBuf.writeFloatTriple(triple: Triple<Float, Float, Float>): ByteBuf {
+    writeFloat(triple.first)
+    writeFloat(triple.second)
+    writeFloat(triple.third)
+    return this
+}
+
+fun ByteBuf.readFloatTriple(): Triple<Float, Float, Float> = Triple(readFloat(), readFloat(), readFloat())
 
 fun ByteBuf.writeJson(json: JsonBase) = writeString(json.toJsonString())
 

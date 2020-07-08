@@ -1,13 +1,15 @@
 package com.williambl.raycastengine.world
 
-import com.williambl.raycastengine.ServerNetworkManager
+import com.williambl.raycastengine.*
 import com.williambl.raycastengine.collision.AABBQuadTree
 import com.williambl.raycastengine.collision.CollisionProvider
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.render.Texture
+import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import java.util.*
 
 
 class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider {
@@ -34,11 +36,8 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
             if (it is Tickable)
                 it.tick()
         }
-        gameObjects.addAll(gameObjectsToAdd)
-        gameObjectsToAdd.clear()
 
-        gameObjects.removeAll(gameObjectsToRemove)
-        gameObjectsToRemove.clear()
+        updateGameObjectLists()
 
         if (!isClient) {
             gameObjects.forEach {
@@ -66,6 +65,31 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
     override fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T> {
         return gameObjects.filterIsInstance(klass)
+    }
+
+    override fun toBytes(buf: ByteBuf, destinationId: UUID?) {
+        updateGameObjectLists()
+
+        buf.write2DIntArray(map)
+
+        buf.writeFloatTriple(floorColor)
+        buf.writeFloatTriple(skyColor)
+
+        buf.writeStrings(wallTextures.map { it.location })
+
+        val gameObjects = Main.world.getGameObjectsOfType(GameObject::class.java)
+        buf.writeInt(gameObjects.size)
+        gameObjects.forEach {
+            buf.writeGameObject(it)
+        }
+    }
+
+    fun updateGameObjectLists() {
+        gameObjects.addAll(gameObjectsToAdd)
+        gameObjectsToAdd.clear()
+
+        gameObjects.removeAll(gameObjectsToRemove)
+        gameObjectsToRemove.clear()
     }
 
 }

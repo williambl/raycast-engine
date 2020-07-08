@@ -3,12 +3,10 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
-import com.williambl.raycastengine.gameobject.RemotePlayer
 import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.input.InputManager
-import com.williambl.raycastengine.world.DefaultWorld
+import com.williambl.raycastengine.world.DefaultWorldFileInterpreter
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import io.netty.bootstrap.Bootstrap
@@ -57,6 +55,8 @@ object Main {
 
     val queuedWork: Queue<Runnable> = ConcurrentLinkedQueue<Runnable>()
 
+    val myId = UUID.randomUUID()
+
     @JvmStatic
     fun main(args: Array<String>) {
         init(args)
@@ -90,21 +90,15 @@ object Main {
             val id = buf.readUUID()
             ServerNetworkManager.channels[id] = packet.ctx.channel()
             queuedWork.add(Runnable {
-                val player = RemotePlayer()
+                val player = Player()
                 player.id = id
                 player.x = 3.0
                 player.y = 3.0
                 world.addGameObject(player)
 
                 val rsp = Unpooled.buffer()
-                rsp.write2DIntArray(world.map)
-                val gameObjects = world.getGameObjectsOfType(GameObject::class.java)
-                        .map { if (it is Player) it.toRemotePlayer() else it }
-                        .map { if (it.id == id && it is RemotePlayer) it.toPlayer() else it }
-                rsp.writeInt(gameObjects.size)
-                gameObjects.forEach {
-                    rsp.writeGameObject(it)
-                }
+                world.toBytes(rsp)
+
                 ServerNetworkManager.sendPacketToClient("sync", rsp, id)
             })
         }
@@ -149,12 +143,10 @@ object Main {
             queuedWork.offer(Runnable {
                 tickables.remove(world)
                 startupListeners.remove(world)
-                world = DefaultWorld(buf.read2DIntArray())
+                world = DefaultWorldFileInterpreter().fromBytes(buf)
+                world.isClient = true
                 tickables.add(world)
                 startupListeners.add(world)
-                for (i in 0 until buf.readInt()) {
-                    world.addGameObject(buf.readGameObject())
-                }
                 buf.release()
             })
         }

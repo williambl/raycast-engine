@@ -9,6 +9,8 @@ import com.williambl.raycastengine.util.math.Vec2d
 import com.williambl.raycastengine.util.raytrace.RaytraceMode
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
+import io.netty.buffer.ByteBuf
+import java.util.*
 import kotlin.math.abs
 
 interface World: StartupListener, Tickable {
@@ -22,6 +24,8 @@ interface World: StartupListener, Tickable {
     fun removeGameObject(gameObject: GameObject)
 
     fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T>
+
+    fun toBytes(buf: ByteBuf, destinationId: UUID? = null)
 
     fun isTileAir(x: Int, y: Int): Boolean {
         return map[x][y] == 0

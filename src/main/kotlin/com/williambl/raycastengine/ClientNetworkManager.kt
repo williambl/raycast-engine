@@ -49,7 +49,7 @@ object ClientNetworkManager : ChannelInboundHandlerAdapter(), NetworkManager {
     override fun channelActive(ctx: ChannelHandlerContext?) {
         super.channelActive(ctx)
         channel = ctx?.channel()
-        sendPacketToServer("login", Unpooled.buffer().writeUUID(UUID.randomUUID()))
+        sendPacketToServer("login", Unpooled.buffer().writeUUID(Main.myId))
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext?) {

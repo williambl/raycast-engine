@@ -172,7 +172,8 @@
       "constructor": 1,
       "args": [
         2.0,
-        2.0
+        2.0,
+        true
       ]
     }
   ]

@@ -2,9 +2,10 @@ package com.williambl.raycastengine.world
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
+import com.williambl.raycastengine.*
 import com.williambl.raycastengine.gameobject.GameObject
-import com.williambl.raycastengine.getObjectFromJson
 import com.williambl.raycastengine.render.Texture
+import io.netty.buffer.ByteBuf
 
 class DefaultWorldFileInterpreter: WorldFileInterpreter {
 
@@ -40,6 +41,21 @@ class DefaultWorldFileInterpreter: WorldFileInterpreter {
 
                 world.addGameObject(gameObject)
             }
+        }
+
+        return world
+    }
+
+    override fun fromBytes(buf: ByteBuf): World {
+        val world = DefaultWorld(buf.read2DIntArray())
+
+        world.floorColor = buf.readFloatTriple()
+        world.skyColor = buf.readFloatTriple()
+
+        world.wallTextures = buf.readStrings().map { Texture(it) }.toTypedArray()
+
+        for (i in 0 until buf.readInt()) {
+            world.addGameObject(buf.readGameObject())
         }
 
         return world
