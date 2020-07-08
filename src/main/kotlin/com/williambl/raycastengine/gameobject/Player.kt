@@ -3,6 +3,9 @@ package com.williambl.raycastengine.gameobject
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.render.DefaultWorldRenderer
+import com.williambl.raycastengine.render.PlayerRenderer
+import com.williambl.raycastengine.render.Renderable
+import com.williambl.raycastengine.render.RenderingContext
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
@@ -10,7 +13,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camera(x, y), Tickable {
+class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camera(x, y), Tickable, Renderable<Player> {
 
     init {
         if (isLocal)
@@ -18,6 +21,8 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     }
 
     val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
+
+    val renderer: PlayerRenderer = PlayerRenderer()
 
     override fun tick() {
         if (id == Main.myId) {
@@ -82,5 +87,11 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
             is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(result.x.toDouble() + 0.5, result.y.toDouble() + 0.5)
             else -> listOf()
         }.filter { it.owner is Interactable }.forEach { (it.owner as Interactable).interact(this, result) }
+    }
+
+    override fun getRenderer(): (Player, RenderingContext) -> Unit {
+        if (id == Main.myId)
+            return { _, _ -> }
+        return renderer::render
     }
 }
