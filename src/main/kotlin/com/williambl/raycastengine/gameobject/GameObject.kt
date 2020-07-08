@@ -12,7 +12,14 @@ open class GameObject(var x: Double = 0.0, var y: Double = 0.0) {
 
     open var id: UUID = UUID.randomUUID()
 
+    //TODO: some system that auto-sets this
     var isDirty = false
+
+    fun setPos(xIn: Double, yIn: Double) {
+        x = xIn
+        y = yIn
+        isDirty = true
+    }
 
     open fun toBytes(byteBuf: ByteBuf) {
         byteBuf.writeUUID(id)

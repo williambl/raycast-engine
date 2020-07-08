@@ -153,23 +153,8 @@
       ]
     },
     {
-      "class": "com.williambl.raycastengine.gameobject.InteractableSprite",
-      "constructor": 2,
-      "args": [
-        {
-          "class": "com.williambl.raycastengine.render.Texture",
-          "constructor": 0,
-          "args": [
-            "/face.png"
-          ]
-        },
-        5.0,
-        5.0
-      ]
-    },
-    {
       "class": "com.williambl.raycastengine.gameobject.Player",
-      "constructor": 1,
+      "constructor": 0,
       "args": [
         2.0,
         2.0,

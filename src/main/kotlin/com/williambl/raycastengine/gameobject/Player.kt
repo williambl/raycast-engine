@@ -1,5 +1,6 @@
 package com.williambl.raycastengine.gameobject
 
+import com.williambl.raycastengine.ClientNetworkManager
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.render.DefaultWorldRenderer
@@ -9,6 +10,8 @@ import com.williambl.raycastengine.render.RenderingContext
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
+import com.williambl.raycastengine.writeDoublePair
+import io.netty.buffer.Unpooled
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -38,6 +41,10 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
                 interact()
 
             worldRenderer.tick()
+
+            if (world.isClient) {
+                ClientNetworkManager.sendPacketToServer("move", Unpooled.buffer().writeDouble(x).writeDouble(y).writeDoublePair(dir).writeDoublePair(plane))
+            } else isDirty = true
         }
     }
 

@@ -1,5 +1,7 @@
 package com.williambl.raycastengine
 
+import com.google.common.collect.BiMap
+import com.google.common.collect.HashBiMap
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.Channel
@@ -12,7 +14,7 @@ object ServerNetworkManager : NetworkManager, Supplier<ChannelInboundHandlerAdap
 
     val packetCallbackRegistry: MutableMap<String, (Packet) -> Unit> = mutableMapOf()
 
-    val channels: MutableMap<UUID, Channel> = mutableMapOf()
+    val channels: BiMap<UUID, Channel> = HashBiMap.create()
 
     override fun addPacketCallback(id: String, callback: (Packet) -> Unit) {
         packetCallbackRegistry[id] = callback

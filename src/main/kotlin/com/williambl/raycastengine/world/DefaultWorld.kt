@@ -44,7 +44,8 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
                 if (it.isDirty) {
                     val buf = Unpooled.buffer()
                     it.toBytes(buf)
-                    ServerNetworkManager.sendPacketToAll("gameObjectUpdate", buf)
+                    ServerNetworkManager.sendPacketToAll("sync", buf)
+                    it.isDirty = false
                 }
             }
         }

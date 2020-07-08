@@ -3,8 +3,8 @@ package com.williambl.raycastengine
 import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
-import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.world.DefaultWorldFileInterpreter
 import com.williambl.raycastengine.world.World
@@ -31,7 +31,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 
-
+//TODO: decouple ticks from frames
 object Main {
 
     var window: Long = 0
@@ -72,6 +72,7 @@ object Main {
         initGLFW()
         initGL()
 
+        //TODO: change this if client, only create world when ready to avoid that overwrite
         world = WorldLoader(args.getOrElse(0) { "/world.json" }).load()
         tickables.add(world)
         startupListeners.add(world)
@@ -85,6 +86,7 @@ object Main {
     }
 
     private fun initServer(port: Int) {
+        //TODO: move these
         ServerNetworkManager.addPacketCallback("login") { packet ->
             val buf = packet.buf
             val id = buf.readUUID()
@@ -99,16 +101,17 @@ object Main {
                 val rsp = Unpooled.buffer()
                 world.toBytes(rsp)
 
-                ServerNetworkManager.sendPacketToClient("sync", rsp, id)
+                ServerNetworkManager.sendPacketToClient("fullSync", rsp, id)
             })
         }
         ServerNetworkManager.addPacketCallback("move") { packet ->
             val buf = packet.buf
-            val id = buf.readUUID()
-            val player: Sprite = world.getGameObjectsOfType(Sprite::class.java).firstOrNull { it.id == id }
+            val id = packet.getId()
+            val player = world.getGameObjectsOfType(Player::class.java).firstOrNull { it.id == id }
                     ?: return@addPacketCallback
-            player.x = buf.readDouble()
-            player.y = buf.readDouble()
+            player.setPos(buf.readDouble(), buf.readDouble())
+            player.dir = buf.readDoublePair()
+            player.plane = buf.readDoublePair()
         }
         thread {
             val bossGroup = NioEventLoopGroup()
@@ -138,17 +141,27 @@ object Main {
     }
 
     private fun initClient(port: Int, address: String) {
-        ClientNetworkManager.addPacketCallback("sync") { packet ->
+        //TODO: move these, too
+        ClientNetworkManager.addPacketCallback("fullSync") { packet ->
             val buf = packet.buf.copy()
             queuedWork.offer(Runnable {
                 tickables.remove(world)
                 startupListeners.remove(world)
+                //TODO: don't rely on default
                 world = DefaultWorldFileInterpreter().fromBytes(buf)
                 world.isClient = true
                 tickables.add(world)
                 startupListeners.add(world)
                 buf.release()
             })
+        }
+        ClientNetworkManager.addPacketCallback("sync") { packet ->
+            val id = packet.buf.readUUID()
+            packet.buf.readerIndex(0)
+            world.getGameObjectsOfType(GameObject::class.java).forEach {
+                if (it.id == id)
+                    it.fromBytes(packet.buf)
+            }
         }
         thread {
             val workerGroup = NioEventLoopGroup()
