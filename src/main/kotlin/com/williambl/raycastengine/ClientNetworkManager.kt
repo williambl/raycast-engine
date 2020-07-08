@@ -42,7 +42,8 @@ object ClientNetworkManager : ChannelInboundHandlerAdapter(), NetworkManager {
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext?, cause: Throwable?) {
-        println("exception: ${cause?.message}}\n${cause?.stackTrace}")
+        println("exception: ${cause?.message}}")
+        cause?.printStackTrace()
     }
 
     override fun channelActive(ctx: ChannelHandlerContext?) {
