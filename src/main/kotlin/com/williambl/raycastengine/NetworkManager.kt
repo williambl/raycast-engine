@@ -9,5 +9,6 @@ interface NetworkManager {
 
     fun sendPacketToAll(id: String, data: ByteBuf)
     fun sendPacketToClient(id: String, data: ByteBuf, playerId: UUID)
+    fun sendPacketToServer(id: String, data: ByteBuf)
     fun receivePacket(id: String, packet: Packet)
 }

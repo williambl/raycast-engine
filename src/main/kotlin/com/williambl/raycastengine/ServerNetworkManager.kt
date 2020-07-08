@@ -34,6 +34,8 @@ object ServerNetworkManager : NetworkManager, Supplier<ChannelInboundHandlerAdap
         channels[playerId]?.writeAndFlush(buf)
     }
 
+    override fun sendPacketToServer(id: String, data: ByteBuf) {}
+
     override fun receivePacket(id: String, packet: Packet) {
         packetCallbackRegistry[id]?.invoke(packet)
     }
