@@ -6,6 +6,7 @@ import com.williambl.raycastengine.render.DefaultWorldRenderer
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
+import io.netty.buffer.Unpooled
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -75,5 +76,14 @@ open class Player(x: Double = 0.0, y: Double = 0.0) : Camera(x, y), Tickable {
             is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(result.x.toDouble() + 0.5, result.y.toDouble() + 0.5)
             else -> listOf()
         }.filter { it.owner is Interactable }.forEach { (it.owner as Interactable).interact(this, result) }
+    }
+
+    fun toRemotePlayer(): RemotePlayer {
+        val remotePlayer = RemotePlayer()
+        val buf = Unpooled.buffer()
+        toBytes(buf)
+        remotePlayer.fromBytes(buf)
+        buf.release()
+        return remotePlayer
     }
 }

@@ -4,11 +4,14 @@ import com.williambl.raycastengine.events.InputListener
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
+import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.gameobject.RemotePlayer
 import com.williambl.raycastengine.gameobject.Sprite
 import com.williambl.raycastengine.input.InputManager
+import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
+import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.Unpooled
 import io.netty.channel.Channel
@@ -16,6 +19,9 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.channel.socket.nio.NioSocketChannel
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import io.netty.handler.codec.LengthFieldPrepender
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -72,7 +78,10 @@ object Main {
         initInputListeners()
         initStartupListeners()
 
-        initServer(8080)
+        if (args.getOrNull(1) == "client")
+            initClient(8080, "localhost")
+        else
+            initServer(8080)
     }
 
     private fun initServer(port: Int) {
@@ -83,12 +92,18 @@ object Main {
             queuedWork.add(Runnable {
                 val player = RemotePlayer()
                 player.id = id
+                player.x = 3.0
+                player.y = 3.0
                 world.addGameObject(player)
 
                 val rsp = Unpooled.buffer()
                 rsp.write2DIntArray(world.map)
-                world.getGameObjectsOfType(GameObject::class.java).forEach {
-                    it.toBytes(rsp)
+                val gameObjects = world.getGameObjectsOfType(GameObject::class.java)
+                        .map { if (it is Player) it.toRemotePlayer() else it }
+                        .map { if (it.id == id && it is RemotePlayer) it.toPlayer() else it }
+                rsp.writeInt(gameObjects.size)
+                gameObjects.forEach {
+                    rsp.writeGameObject(it)
                 }
                 ServerNetworkManager.sendPacketToClient("sync", rsp, id)
             })
@@ -110,6 +125,8 @@ object Main {
                         .channel(NioServerSocketChannel::class.java)
                         .childHandler(object : ChannelInitializer<Channel>() {
                             override fun initChannel(ch: Channel) {
+                                ch.pipeline().addLast(LengthFieldBasedFrameDecoder(8192, 0, 4, 0, 4))
+                                ch.pipeline().addLast(LengthFieldPrepender(4))
                                 ch.pipeline().addLast(ServerNetworkManager.get())
                             }
                         })
@@ -122,6 +139,45 @@ object Main {
             } finally {
                 workerGroup.shutdownGracefully()
                 bossGroup.shutdownGracefully()
+            }
+        }
+    }
+
+    private fun initClient(port: Int, address: String) {
+        ClientNetworkManager.addPacketCallback("sync") { packet ->
+            val buf = packet.buf.copy()
+            queuedWork.offer(Runnable {
+                tickables.remove(world)
+                startupListeners.remove(world)
+                world = DefaultWorld(buf.read2DIntArray())
+                tickables.add(world)
+                startupListeners.add(world)
+                for (i in 0 until buf.readInt()) {
+                    world.addGameObject(buf.readGameObject())
+                }
+                buf.release()
+            })
+        }
+        thread {
+            val workerGroup = NioEventLoopGroup()
+            try {
+                val future = Bootstrap()
+                        .group(workerGroup)
+                        .channel(NioSocketChannel::class.java)
+                        .handler(object : ChannelInitializer<Channel>() {
+                            override fun initChannel(ch: Channel) {
+                                ch.pipeline().addLast(LengthFieldBasedFrameDecoder(8192, 0, 4, 0, 4))
+                                ch.pipeline().addLast(LengthFieldPrepender(4))
+                                ch.pipeline().addLast(ClientNetworkManager)
+                            }
+                        })
+                        .option(ChannelOption.SO_KEEPALIVE, true)
+                        .connect(address, port)
+                        .sync()
+
+                future.channel().closeFuture().sync()
+            } finally {
+                workerGroup.shutdownGracefully()
             }
         }
     }

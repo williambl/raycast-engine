@@ -4,7 +4,7 @@ import com.williambl.raycastengine.readDoubleTriple
 import com.williambl.raycastengine.writeDoubleTriple
 import io.netty.buffer.ByteBuf
 
-class Light(x: Double = 0.0, y: Double, var strength: Triple<Double, Double, Double> = Triple(0.0, 0.0, 0.0)) : GameObject(x, y) {
+class Light(x: Double = 0.0, y: Double = 0.0, var strength: Triple<Double, Double, Double> = Triple(0.0, 0.0, 0.0)) : GameObject(x, y) {
 
     constructor(x: Double, y: Double, strength: Double) : this(x, y, Triple(strength, strength, strength))
 

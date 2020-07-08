@@ -134,7 +134,7 @@
   "gameObjects": [
     {
       "class": "com.williambl.raycastengine.gameobject.Light",
-      "constructor": 0,
+      "constructor": 2,
       "args": [
         2.0,
         2.0,
