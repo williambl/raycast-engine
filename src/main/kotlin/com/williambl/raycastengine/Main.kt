@@ -6,7 +6,6 @@ import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
-import com.williambl.raycastengine.world.DefaultWorldFileInterpreter
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import io.netty.bootstrap.Bootstrap
@@ -73,7 +72,7 @@ object Main {
         initGL()
 
         //TODO: change this if client, only create world when ready to avoid that overwrite
-        world = WorldLoader(args.getOrElse(0) { "/world.json" }).load()
+        world = WorldLoader.load(args.getOrElse(0) { "/world.json" })
         tickables.add(world)
         startupListeners.add(world)
         initInputListeners()
@@ -99,7 +98,8 @@ object Main {
                 world.addGameObject(player)
 
                 val rsp = Unpooled.buffer()
-                world.toBytes(rsp)
+                rsp.writeString(world.serializer::class.java.canonicalName)
+                world.serializer.toBytes(world, rsp, id)
 
                 ServerNetworkManager.sendPacketToClient("fullSync", rsp, id)
             })
@@ -147,8 +147,7 @@ object Main {
             queuedWork.offer(Runnable {
                 tickables.remove(world)
                 startupListeners.remove(world)
-                //TODO: don't rely on default
-                world = DefaultWorldFileInterpreter().fromBytes(buf)
+                world = WorldLoader.getSerializer(buf.readString()).fromBytes(buf)
                 world.isClient = true
                 tickables.add(world)
                 startupListeners.add(world)

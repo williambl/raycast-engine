@@ -1,5 +1,5 @@
 {
-  "interpreter": "com.williambl.raycastengine.world.DefaultWorldInterpreter",
+  "serializer": "com.williambl.raycastengine.world.DefaultWorld.Serializer",
   "map": [
     [
       1,
