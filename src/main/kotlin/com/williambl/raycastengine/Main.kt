@@ -157,10 +157,14 @@ object Main {
         ClientNetworkManager.addPacketCallback("sync") { packet ->
             val id = packet.buf.readUUID()
             packet.buf.readerIndex(0)
-            world.getGameObjectsOfType(GameObject::class.java).forEach {
-                if (it.id == id)
-                    it.fromBytes(packet.buf)
-            }
+            val buf = packet.buf.copy()
+            queuedWork.offer(Runnable {
+                world.getGameObjectsOfType(GameObject::class.java).forEach {
+                    if (it.id == id)
+                        it.fromBytes(packet.buf)
+                }
+                buf.release()
+            })
         }
         thread {
             val workerGroup = NioEventLoopGroup()
