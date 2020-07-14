@@ -2,25 +2,23 @@ package com.williambl.raycastengine.gameobject
 
 import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.readUUID
+import com.williambl.raycastengine.synced
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.writeUUID
 import io.netty.buffer.ByteBuf
 import java.util.*
 
-open class GameObject(var x: Double = 0.0, var y: Double = 0.0) {
+open class GameObject(xIn: Double = 0.0, yIn: Double = 0.0) {
+
+    var x: Double by synced(xIn, ::isDirty)
+    var y: Double by synced(yIn, ::isDirty)
 
     lateinit var world: World
 
     open var id: UUID = UUID.randomUUID()
 
-    //TODO: some system that auto-sets this
+    //TODO: some system that marks only certain vars as dirty
     var isDirty = false
-
-    fun setPos(xIn: Double, yIn: Double) {
-        x = xIn
-        y = yIn
-        isDirty = true
-    }
 
     open fun toBytes(byteBuf: ByteBuf) {
         byteBuf.writeUUID(id)

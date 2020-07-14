@@ -14,11 +14,6 @@ import io.netty.buffer.ByteBuf
 open class Sprite(var texture: Texture = Texture(""), x: Double = 0.0, y: Double = 0.0) : GameObject(x, y), Renderable<Sprite> {
     val renderer: SpriteRenderer = SpriteRenderer()
 
-    constructor(byteBuf: ByteBuf) : this(Texture(""), 0.0, 0.0) {
-        @Suppress("LeakingThis")
-        fromBytes(byteBuf)
-    }
-
     override fun getRenderer(): (Sprite, RenderingContext) -> Unit {
         return renderer::render
     }

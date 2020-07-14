@@ -109,7 +109,8 @@ object Main {
             val id = packet.getId()
             val player = world.getGameObjectsOfType(Player::class.java).firstOrNull { it.id == id }
                     ?: return@addPacketCallback
-            player.setPos(buf.readDouble(), buf.readDouble())
+            player.x = buf.readDouble()
+            player.y = buf.readDouble()
             player.dir = buf.readDoublePair()
             player.plane = buf.readDoublePair()
         }
