@@ -25,7 +25,7 @@ open class Sprite(var texture: Texture = Texture(""), x: Double = 0.0, y: Double
 
     override fun toBytes(byteBuf: ByteBuf) {
         super.toBytes(byteBuf)
-        byteBuf.writeString(writeObjectToJson(Texture::class.java, 0, texture.location).toJsonString())
+        byteBuf.writeString(writeObjectToJson(Texture::class.java, texture.location).toJsonString())
     }
 
     override fun fromBytes(byteBuf: ByteBuf) {

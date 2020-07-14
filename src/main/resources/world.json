@@ -134,7 +134,6 @@
   "gameObjects": [
     {
       "class": "com.williambl.raycastengine.gameobject.Light",
-      "constructor": 2,
       "args": [
         2.0,
         2.0,
@@ -145,7 +144,6 @@
     },
     {
       "class": "com.williambl.raycastengine.gameobject.Light",
-      "constructor": 1,
       "args": [
         7.0,
         8.0,
@@ -154,7 +152,6 @@
     },
     {
       "class": "com.williambl.raycastengine.gameobject.Player",
-      "constructor": 0,
       "args": [
         2.0,
         2.0,

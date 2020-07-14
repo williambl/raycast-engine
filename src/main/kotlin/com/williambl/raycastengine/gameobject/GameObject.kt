@@ -1,5 +1,6 @@
 package com.williambl.raycastengine.gameobject
 
+import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.readUUID
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.writeUUID
@@ -31,5 +32,17 @@ open class GameObject(var x: Double = 0.0, var y: Double = 0.0) {
         id = byteBuf.readUUID()
         x = byteBuf.readDouble()
         y = byteBuf.readDouble()
+    }
+
+    open fun toJson(json: JsonObject) {
+        json["id"] = id.toString()
+        json["x"] = x
+        json["y"] = y
+    }
+
+    open fun fromJson(json: JsonObject) {
+        id = UUID.fromString(json["uuid"].toString())
+        x = json["x"] as Double
+        y = json["y"] as Double
     }
 }

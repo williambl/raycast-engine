@@ -70,7 +70,7 @@ fun ByteBuf.writeJson(json: JsonBase) = writeString(json.toJsonString())
 fun ByteBuf.readJson(): Any = Parser.default().parse(readString().reader())
 
 fun ByteBuf.writeObject(klass: Class<*>?, constructor: Int, vararg args: Any?): ByteBuf {
-    writeString(writeObjectToJson(klass, constructor, args).toJsonString())
+    writeString(writeObjectToJson(klass, args).toJsonString())
     return this
 }
 
