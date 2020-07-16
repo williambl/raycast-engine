@@ -18,7 +18,7 @@ fun ByteBuf.writeString(string: String): ByteBuf {
 fun ByteBuf.readString(): String = String(readBytes(readInt()).toByteArray())
 
 fun ByteBuf.toByteArray(): ByteArray {
-    return if (this.hasArray())
+    val result = if (this.hasArray())
         array()
     else {
         val bytes = mutableListOf<Byte>()
@@ -26,6 +26,8 @@ fun ByteBuf.toByteArray(): ByteArray {
             bytes.add(readByte())
         bytes.toByteArray()
     }
+    this.release()
+    return result
 }
 
 fun ByteBuf.writeStrings(collection: Collection<String>) {

@@ -47,7 +47,7 @@ object ServerNetworkManager : NetworkManager, Supplier<ChannelInboundHandlerAdap
             override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
                 msg as ByteBuf
                 try {
-                    receivePacket(msg.readString(), Packet(ctx, msg.readBytes(msg.readableBytes())))
+                    receivePacket(msg.readString(), Packet(ctx, msg))
                 } finally {
                     msg.release()
                 }
