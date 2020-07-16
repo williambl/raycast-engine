@@ -29,6 +29,10 @@ import org.reflections.Reflections
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 //TODO: decouple ticks from frames
 object Main {
@@ -157,12 +161,17 @@ object Main {
         }
         ClientNetworkManager.addPacketCallback("sync") { packet ->
             val id = packet.buf.readUUID()
-            packet.buf.readerIndex(0)
             val buf = packet.buf.copy()
             queuedWork.offer(Runnable {
-                world.getGameObjectsOfType(GameObject::class.java).forEach {
-                    if (it.id == id)
-                        it.fromBytes(packet.buf)
+                val name = buf.readString()
+                val gObj = world.getGameObjectsOfType(GameObject::class.java).find { it.id == id }
+                if (gObj != null) {
+                    val prop = gObj::class.memberProperties.filter { it is KMutableProperty<*> }.find { prop -> prop.name == name } as KMutableProperty1<GameObject, Any?>?
+                    prop?.isAccessible = true
+                    val delegate = prop?.getDelegate(gObj)
+                    if (delegate is SyncedProperty<*>) {
+                        delegate.setFromBytes(prop, gObj, buf)
+                    }
                 }
                 buf.release()
             })

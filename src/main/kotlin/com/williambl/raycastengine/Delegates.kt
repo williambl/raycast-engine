@@ -1,12 +1,27 @@
 package com.williambl.raycastengine
 
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
+import java.util.*
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
-inline fun <T> synced(initialValue: T, dirtyProperty: KMutableProperty<Boolean>/*, crossinline toBytes: (T, ByteBuf) -> Unit, crossinline fromBytes: (T, ByteBuf) -> Unit*/):
-        ReadWriteProperty<Any?, T> =
-        object : ObservableProperty<T>(initialValue) {
-            override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) = dirtyProperty.setter.call(true)
-        }
+fun <T> synced(initialValue: T, ownerIdProp: KProperty<UUID>, toBytes: (ByteBuf, T) -> ByteBuf, fromBytes: (ByteBuf) -> T): ReadWriteProperty<Any?, T> =
+        SyncedProperty(initialValue, ownerIdProp, toBytes, fromBytes)
+
+class SyncedProperty<T>(private val initialValue: T, private val ownerIdProp: KProperty<UUID>, private val toBytes: (ByteBuf, T) -> ByteBuf, private val fromBytes: (ByteBuf) -> T) : ObservableProperty<T>(initialValue) {
+    override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
+        val buf = Unpooled.buffer()
+        buf.writeUUID(ownerIdProp.call())
+        buf.writeString(property.name)
+        toBytes(buf, newValue)
+        ServerNetworkManager.sendPacketToAll("sync", buf)
+    }
+
+    fun setFromBytes(property: KMutableProperty<*>, receiver: Any?, buf: ByteBuf) {
+        property.setter.call(receiver, fromBytes(buf))
+    }
+}
+

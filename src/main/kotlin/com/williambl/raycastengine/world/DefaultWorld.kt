@@ -10,7 +10,6 @@ import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.render.Texture
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
 import java.util.*
 
 
@@ -43,17 +42,6 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
         }
 
         updateGameObjectLists()
-
-        if (!isClient) {
-            gameObjects.forEach {
-                if (it.isDirty) {
-                    val buf = Unpooled.buffer()
-                    it.toBytes(buf)
-                    ServerNetworkManager.sendPacketToAll("sync", buf)
-                    it.isDirty = false
-                }
-            }
-        }
     }
 
     override fun addGameObject(gameObject: GameObject) {

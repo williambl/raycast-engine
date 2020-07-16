@@ -11,7 +11,7 @@ class Light(x: Double = 0.0, y: Double = 0.0, strengthIn: Triple<Double, Double,
 
     constructor(x: Double, y: Double, strengthR: Double, strengthG: Double, strengthB: Double) : this(x, y, Triple(strengthR, strengthG, strengthB))
 
-    var strength: Triple<Double, Double, Double> by synced(strengthIn, ::isDirty)
+    var strength: Triple<Double, Double, Double> by synced(strengthIn, ::id, ByteBuf::writeDoubleTriple, ByteBuf::readDoubleTriple)
 
     override fun toBytes(byteBuf: ByteBuf) {
         super.toBytes(byteBuf)

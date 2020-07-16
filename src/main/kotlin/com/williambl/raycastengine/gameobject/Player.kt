@@ -44,7 +44,7 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
 
             if (world.isClient) {
                 ClientNetworkManager.sendPacketToServer("move", Unpooled.buffer().writeDouble(x).writeDouble(y).writeDoublePair(dir).writeDoublePair(plane))
-            } else isDirty = true
+            }
         }
     }
 

@@ -10,15 +10,12 @@ import java.util.*
 
 open class GameObject(xIn: Double = 0.0, yIn: Double = 0.0) {
 
-    var x: Double by synced(xIn, ::isDirty)
-    var y: Double by synced(yIn, ::isDirty)
+    var x: Double by synced(xIn, ::id, ByteBuf::writeDouble, ByteBuf::readDouble)
+    var y: Double by synced(yIn, ::id, ByteBuf::writeDouble, ByteBuf::readDouble)
 
     lateinit var world: World
 
     open var id: UUID = UUID.randomUUID()
-
-    //TODO: some system that marks only certain vars as dirty
-    var isDirty = false
 
     open fun toBytes(byteBuf: ByteBuf) {
         byteBuf.writeUUID(id)
