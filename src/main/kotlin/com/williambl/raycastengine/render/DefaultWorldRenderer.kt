@@ -1,7 +1,7 @@
 package com.williambl.raycastengine.render
 
 import com.williambl.raycastengine.Main
-import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.events.RenderTickable
 import com.williambl.raycastengine.gameobject.Camera
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Light
@@ -16,7 +16,7 @@ import kotlin.math.min
 import kotlin.math.pow
 
 
-class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickable {
+class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : RenderTickable {
 
     lateinit var floorShape: ColouredRenderableShape
     lateinit var skyShape: ColouredRenderableShape
@@ -29,7 +29,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Tickab
         setupGL()
     }
 
-    override fun tick() {
+    override fun renderTick() {
         render(world, camera)
     }
 

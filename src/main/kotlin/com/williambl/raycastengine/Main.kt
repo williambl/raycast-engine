@@ -1,6 +1,7 @@
 package com.williambl.raycastengine
 
 import com.williambl.raycastengine.events.InputListener
+import com.williambl.raycastengine.events.RenderTickable
 import com.williambl.raycastengine.events.StartupListener
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
@@ -28,7 +29,9 @@ import org.lwjgl.system.MemoryUtil.NULL
 import org.reflections.Reflections
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
+import kotlin.math.max
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.memberProperties
@@ -50,6 +53,8 @@ object Main {
 
     var tickables: ArrayList<Tickable> = arrayListOf()
 
+    var renderTickables = mutableListOf<RenderTickable>()
+
     var inputListeners: ArrayList<InputListener> = arrayListOf(
             inputManager
     )
@@ -60,12 +65,21 @@ object Main {
 
     val myId = UUID.randomUUID()
 
+    val shutdown = AtomicBoolean()
+
     @JvmStatic
     fun main(args: Array<String>) {
         init(args)
 
+        //TODO:
+        thread(name = "Render Thread") {
+            while (!shutdown.get())
+                loop()
+        }
+
+
         while (!glfwWindowShouldClose(window)) {
-            loop()
+            renderLoop()
         }
 
         cleanup()
@@ -118,11 +132,11 @@ object Main {
             player.dir = buf.readDoublePair()
             player.plane = buf.readDoublePair()
         }
-        thread {
+        thread(name = "Server Network Thread") {
             val bossGroup = NioEventLoopGroup()
             val workerGroup = NioEventLoopGroup()
             try {
-                val future = ServerBootstrap()
+                ServerBootstrap()
                         .group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel::class.java)
                         .childHandler(object : ChannelInitializer<Channel>() {
@@ -137,7 +151,9 @@ object Main {
                         .bind(port)
                         .sync()
 
-                future.channel().closeFuture().sync()
+                while (!shutdown.get()) {
+                    Thread.sleep(100)
+                }
             } finally {
                 workerGroup.shutdownGracefully()
                 bossGroup.shutdownGracefully()
@@ -152,6 +168,9 @@ object Main {
             queuedWork.offer(Runnable {
                 tickables.remove(world)
                 startupListeners.remove(world)
+                world.getGameObjectsOfType(RenderTickable::class.java).forEach {
+                    renderTickables.remove(it)
+                }
                 world = WorldLoader.getSerializer(buf.readString()).fromBytes(buf)
                 world.isClient = true
                 tickables.add(world)
@@ -164,7 +183,7 @@ object Main {
             val buf = packet.buf.copy()
             queuedWork.offer(Runnable {
                 val name = buf.readString()
-                val gObj = world.getGameObjectsOfType(GameObject::class.java).find { it.id == id }
+                val gObj = world.getGameObjects().find { it.id == id }
                 if (gObj != null) {
                     val prop = gObj::class.memberProperties.filter { it is KMutableProperty<*> }.find { prop -> prop.name == name } as KMutableProperty1<GameObject, Any?>?
                     prop?.isAccessible = true
@@ -176,10 +195,10 @@ object Main {
                 buf.release()
             })
         }
-        thread {
+        thread(name = "Client Network Thread") {
             val workerGroup = NioEventLoopGroup()
             try {
-                val future = Bootstrap()
+                Bootstrap()
                         .group(workerGroup)
                         .channel(NioSocketChannel::class.java)
                         .handler(object : ChannelInitializer<Channel>() {
@@ -193,7 +212,9 @@ object Main {
                         .connect(address, port)
                         .sync()
 
-                future.channel().closeFuture().sync()
+                while (!shutdown.get()) {
+                    Thread.sleep(100)
+                }
             } finally {
                 workerGroup.shutdownGracefully()
             }
@@ -201,6 +222,7 @@ object Main {
     }
 
     private fun cleanup() {
+        shutdown.set(true)
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window)
         glfwDestroyWindow(window)
@@ -273,7 +295,13 @@ object Main {
         }
     }
 
-    private fun loop() {
+    private fun tickRenderTickables() {
+        renderTickables.forEach {
+            it.renderTick()
+        }
+    }
+
+    private fun renderLoop() {
         // Clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
@@ -281,7 +309,7 @@ object Main {
         // invoked during this call.
         glfwPollEvents()
 
-        tickTickables()
+        tickRenderTickables()
 
         do {
             val runnable = queuedWork.poll()
@@ -290,6 +318,12 @@ object Main {
 
         // Swap the color buffers
         glfwSwapBuffers(window)
+    }
+
+    private fun loop() {
+        val next = System.currentTimeMillis() + 16
+        tickTickables()
+        Thread.sleep(max(0, next - System.currentTimeMillis()))
     }
 
 }

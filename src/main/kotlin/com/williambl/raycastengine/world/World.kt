@@ -25,6 +25,8 @@ interface World: StartupListener, Tickable {
 
     fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T>
 
+    fun getGameObjects(): List<GameObject>
+
     fun isTileAir(x: Int, y: Int): Boolean {
         return map[x][y] == 0
     }

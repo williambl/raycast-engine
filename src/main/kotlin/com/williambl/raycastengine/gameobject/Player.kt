@@ -1,7 +1,9 @@
 package com.williambl.raycastengine.gameobject
 
+import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.ClientNetworkManager
 import com.williambl.raycastengine.Main
+import com.williambl.raycastengine.events.RenderTickable
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.render.DefaultWorldRenderer
 import com.williambl.raycastengine.render.PlayerRenderer
@@ -11,16 +13,19 @@ import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
 import com.williambl.raycastengine.writeDoublePair
+import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import kotlin.math.cos
 import kotlin.math.sin
 
 
-class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camera(x, y), Tickable, Renderable<Player> {
+class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camera(x, y), Tickable, RenderTickable, Renderable<Player> {
 
     init {
-        if (isLocal)
+        if (isLocal) {
             id = Main.myId
+            Main.renderTickables.add(this)
+        }
     }
 
     val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
@@ -40,22 +45,25 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
             if (Main.inputManager.isPressed("interact"))
                 interact()
 
-            worldRenderer.tick()
-
             if (world.isClient) {
                 ClientNetworkManager.sendPacketToServer("move", Unpooled.buffer().writeDouble(x).writeDouble(y).writeDoublePair(dir).writeDoublePair(plane))
             }
         }
     }
 
+    override fun renderTick() {
+        if (id == Main.myId)
+            worldRenderer.renderTick()
+    }
+
     val moveSpeed = 0.075
     val rotSpeed = 0.075
 
     private fun forward() {
-        val moveVec = Pair(dir.first*moveSpeed, dir.second*moveSpeed)
-        if (Main.world.map[(x+moveVec.first).toInt()][y.toInt()] == 0)
+        val moveVec = Pair(dir.first * moveSpeed, dir.second * moveSpeed)
+        if (Main.world.map[(x + moveVec.first).toInt()][y.toInt()] == 0)
             x += moveVec.first
-        if (Main.world.map[x.toInt()][(y+moveVec.second).toInt()] == 0)
+        if (Main.world.map[x.toInt()][(y + moveVec.second).toInt()] == 0)
             y += moveVec.second
     }
 
@@ -100,5 +108,17 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
         if (id == Main.myId)
             return { _, _ -> }
         return renderer::render
+    }
+
+    override fun fromJson(json: JsonObject) {
+        super.fromJson(json)
+        if (id == Main.myId)
+            Main.renderTickables.add(this)
+    }
+
+    override fun fromBytes(byteBuf: ByteBuf) {
+        super.fromBytes(byteBuf)
+        if (id == Main.myId)
+            Main.renderTickables.add(this)
     }
 }

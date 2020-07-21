@@ -17,8 +17,9 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
     lateinit var wallTextures: Array<Texture>
 
-    var gameObjects: ArrayList<GameObject> = arrayListOf()
-        private set
+    private val gameObjects: MutableList<GameObject> = mutableListOf()
+
+    private val gameObjectsMutex = Any()
 
     val gameObjectsToAdd = mutableListOf<GameObject>()
     val gameObjectsToRemove = mutableListOf<GameObject>()
@@ -58,15 +59,23 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
     }
 
     override fun <T : Any> getGameObjectsOfType(klass: Class<T>): List<T> {
-        return gameObjects.filterIsInstance(klass)
+        return getGameObjects().filterIsInstance(klass)
+    }
+
+    override fun getGameObjects(): List<GameObject> {
+        synchronized(gameObjectsMutex) {
+            return gameObjects.toList()
+        }
     }
 
     fun updateGameObjectLists() {
-        gameObjects.addAll(gameObjectsToAdd)
-        gameObjectsToAdd.clear()
+        synchronized(gameObjectsMutex) {
+            gameObjects.addAll(gameObjectsToAdd)
+            gameObjectsToAdd.clear()
 
-        gameObjects.removeAll(gameObjectsToRemove)
-        gameObjectsToRemove.clear()
+            gameObjects.removeAll(gameObjectsToRemove)
+            gameObjectsToRemove.clear()
+        }
     }
 
     companion object Serializer : WorldSerializer {
@@ -152,7 +161,7 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
             buf.writeStrings(world.wallTextures.map { it.location })
 
-            val gameObjects = Main.world.getGameObjectsOfType(GameObject::class.java)
+            val gameObjects = Main.world.getGameObjects()
             buf.writeInt(gameObjects.size)
             gameObjects.forEach {
                 buf.writeGameObject(it)
