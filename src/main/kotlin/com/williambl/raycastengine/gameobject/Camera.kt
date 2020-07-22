@@ -1,7 +1,7 @@
 package com.williambl.raycastengine.gameobject
 
-import com.williambl.raycastengine.readDoublePair
-import com.williambl.raycastengine.writeDoublePair
+import com.williambl.raycastengine.util.network.readDoublePair
+import com.williambl.raycastengine.util.network.writeDoublePair
 import io.netty.buffer.ByteBuf
 
 open class Camera(x: Double = 0.0, y: Double = 0.0) : GameObject(x, y) {

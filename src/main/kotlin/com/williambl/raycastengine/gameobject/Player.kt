@@ -1,18 +1,18 @@
 package com.williambl.raycastengine.gameobject
 
 import com.beust.klaxon.JsonObject
-import com.williambl.raycastengine.ClientNetworkManager
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.RenderTickable
 import com.williambl.raycastengine.events.Tickable
+import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.render.DefaultWorldRenderer
 import com.williambl.raycastengine.render.PlayerRenderer
 import com.williambl.raycastengine.render.Renderable
 import com.williambl.raycastengine.render.RenderingContext
+import com.williambl.raycastengine.util.network.writeDoublePair
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import com.williambl.raycastengine.world.DefaultWorld
-import com.williambl.raycastengine.writeDoublePair
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import kotlin.math.cos

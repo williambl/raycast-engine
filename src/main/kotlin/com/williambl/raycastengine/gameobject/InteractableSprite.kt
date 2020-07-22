@@ -1,10 +1,10 @@
 package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
-import com.williambl.raycastengine.readGameObject
 import com.williambl.raycastengine.render.Texture
+import com.williambl.raycastengine.util.network.readGameObject
+import com.williambl.raycastengine.util.network.writeGameObject
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
-import com.williambl.raycastengine.writeGameObject
 import io.netty.buffer.Unpooled
 import java.nio.charset.Charset
 

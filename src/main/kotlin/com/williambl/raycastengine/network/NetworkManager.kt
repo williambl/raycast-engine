@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.network
 
 import io.netty.buffer.ByteBuf
 import java.util.*

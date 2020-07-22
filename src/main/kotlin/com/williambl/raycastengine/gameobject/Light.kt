@@ -1,8 +1,8 @@
 package com.williambl.raycastengine.gameobject
 
-import com.williambl.raycastengine.readDoubleTriple
-import com.williambl.raycastengine.synced
-import com.williambl.raycastengine.writeDoubleTriple
+import com.williambl.raycastengine.util.network.readDoubleTriple
+import com.williambl.raycastengine.util.network.writeDoubleTriple
+import com.williambl.raycastengine.util.synced
 import io.netty.buffer.ByteBuf
 
 class Light(x: Double = 0.0, y: Double = 0.0, strengthIn: Triple<Double, Double, Double> = Triple(0.0, 0.0, 0.0)) : GameObject(x, y) {

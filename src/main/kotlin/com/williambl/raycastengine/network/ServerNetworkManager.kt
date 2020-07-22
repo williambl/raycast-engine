@@ -1,7 +1,9 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.network
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
+import com.williambl.raycastengine.util.network.readString
+import com.williambl.raycastengine.util.network.writeString
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.Channel

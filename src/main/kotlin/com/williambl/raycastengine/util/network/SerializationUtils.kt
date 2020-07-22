@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.util.network
 
 import com.beust.klaxon.JsonObject
 import java.lang.reflect.Constructor

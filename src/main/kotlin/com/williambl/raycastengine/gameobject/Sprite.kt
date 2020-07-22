@@ -1,14 +1,14 @@
 package com.williambl.raycastengine.gameobject
 
 import com.beust.klaxon.JsonObject
-import com.williambl.raycastengine.getObjectFromJson
-import com.williambl.raycastengine.readJson
 import com.williambl.raycastengine.render.Renderable
 import com.williambl.raycastengine.render.RenderingContext
 import com.williambl.raycastengine.render.SpriteRenderer
 import com.williambl.raycastengine.render.Texture
-import com.williambl.raycastengine.writeObjectToJson
-import com.williambl.raycastengine.writeString
+import com.williambl.raycastengine.util.network.getObjectFromJson
+import com.williambl.raycastengine.util.network.readJson
+import com.williambl.raycastengine.util.network.writeObjectToJson
+import com.williambl.raycastengine.util.network.writeString
 import io.netty.buffer.ByteBuf
 
 open class Sprite(var texture: Texture = Texture(""), x: Double = 0.0, y: Double = 0.0) : GameObject(x, y), Renderable<Sprite> {

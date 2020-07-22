@@ -1,10 +1,10 @@
 package com.williambl.raycastengine.gameobject
 
 import com.beust.klaxon.JsonObject
-import com.williambl.raycastengine.readUUID
-import com.williambl.raycastengine.synced
+import com.williambl.raycastengine.util.network.readUUID
+import com.williambl.raycastengine.util.network.writeUUID
+import com.williambl.raycastengine.util.synced
 import com.williambl.raycastengine.world.World
-import com.williambl.raycastengine.writeUUID
 import io.netty.buffer.ByteBuf
 import java.util.*
 

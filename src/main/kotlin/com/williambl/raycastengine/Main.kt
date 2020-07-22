@@ -7,6 +7,13 @@ import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.GameObject
 import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
+import com.williambl.raycastengine.network.ClientNetworkManager
+import com.williambl.raycastengine.network.ServerNetworkManager
+import com.williambl.raycastengine.util.SyncedProperty
+import com.williambl.raycastengine.util.network.readDoublePair
+import com.williambl.raycastengine.util.network.readString
+import com.williambl.raycastengine.util.network.readUUID
+import com.williambl.raycastengine.util.network.writeString
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import io.netty.bootstrap.Bootstrap
@@ -63,7 +70,7 @@ object Main {
 
     val queuedWork: Queue<Runnable> = ConcurrentLinkedQueue<Runnable>()
 
-    val myId = UUID.randomUUID()
+    val myId: UUID = UUID.randomUUID()
 
     val shutdown = AtomicBoolean()
 
@@ -71,12 +78,10 @@ object Main {
     fun main(args: Array<String>) {
         init(args)
 
-        //TODO:
-        thread(name = "Render Thread") {
+        thread(name = "Tick Thread") {
             while (!shutdown.get())
                 loop()
         }
-
 
         while (!glfwWindowShouldClose(window)) {
             renderLoop()

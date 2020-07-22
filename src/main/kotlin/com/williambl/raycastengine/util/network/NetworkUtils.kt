@@ -1,4 +1,4 @@
-package com.williambl.raycastengine
+package com.williambl.raycastengine.util.network
 
 import com.beust.klaxon.JsonBase
 import com.beust.klaxon.JsonObject
@@ -39,7 +39,7 @@ fun ByteBuf.readStrings(): Array<String> = Array(readInt()) { readString() }
 
 fun ByteBuf.writeUUID(uuid: UUID): ByteBuf = writeString(uuid.toString())
 
-fun ByteBuf.readUUID() = UUID.fromString(readString())
+fun ByteBuf.readUUID(): UUID = UUID.fromString(readString())
 
 fun ByteBuf.writeDoublePair(pair: Pair<Double, Double>): ByteBuf {
     writeDouble(pair.first)
@@ -71,7 +71,7 @@ fun ByteBuf.writeJson(json: JsonBase) = writeString(json.toJsonString())
 
 fun ByteBuf.readJson(): Any = Parser.default().parse(readString().reader())
 
-fun ByteBuf.writeObject(klass: Class<*>?, constructor: Int, vararg args: Any?): ByteBuf {
+fun ByteBuf.writeObject(klass: Class<*>?, vararg args: Any?): ByteBuf {
     writeString(writeObjectToJson(klass, args).toJsonString())
     return this
 }
