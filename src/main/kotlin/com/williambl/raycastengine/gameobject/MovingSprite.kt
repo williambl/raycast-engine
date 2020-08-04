@@ -2,10 +2,9 @@ package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.Tickable
-import com.williambl.raycastengine.render.Texture
 import kotlin.random.Random
 
-class MovingSprite(texture: Texture, x: Double, y: Double) : Sprite(texture, x, y), Tickable {
+class MovingSprite(textureLoc: String, x: Double, y: Double) : Sprite(textureLoc, x, y), Tickable {
 
     val rand = Random(345323 + x.toInt() + y.toInt())
 

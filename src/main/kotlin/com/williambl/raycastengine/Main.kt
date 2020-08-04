@@ -316,17 +316,17 @@ object Main {
 
         tickRenderTickables()
 
-        do {
-            val runnable = queuedWork.poll()
-            runnable?.run()
-        } while (runnable != null)
-
         // Swap the color buffers
         glfwSwapBuffers(window)
     }
 
     private fun loop() {
         val next = System.currentTimeMillis() + 16
+        //TODO: be able to schedule tasks on render and tick threads
+        do {
+            val runnable = queuedWork.poll()
+            runnable?.run()
+        } while (runnable != null)
         tickTickables()
         Thread.sleep(max(0, next - System.currentTimeMillis()))
     }

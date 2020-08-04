@@ -2,10 +2,10 @@ package com.williambl.raycastengine.render
 
 import com.williambl.raycastengine.gameobject.Sprite
 
-class SpriteRenderer {
+class SpriteRenderer(textureLoc: String) {
 
+    val texture = Texture(textureLoc)
     lateinit var renderableShape: TexturedRenderableShape
-
 
     //TODO: work out why this renders a little off from certain directions
     fun render(sprite: Sprite, context: RenderingContext) {
@@ -22,7 +22,7 @@ class SpriteRenderer {
                             2, 3, 0
                     ),
                     RenderUtils.getAndCompileShaderProgram("flatTextured"),
-                    sprite.texture
+                    texture
             )
         }
 
@@ -46,7 +46,7 @@ class SpriteRenderer {
             return
 
         val spriteHeight = 1.0 / spriteDepth
-        val spriteWidth = spriteHeight * (sprite.texture.width / sprite.texture.height)
+        val spriteWidth = spriteHeight * (texture.width / texture.height)
 
         val brightness = context.worldRenderer.calculateLighting(context.world, sprite.x, sprite.y)
 

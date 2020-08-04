@@ -8,12 +8,24 @@ import java.nio.ByteBuffer
 
 class Texture(val location: String) {
 
-    private val id: Int
+    private var id: Int = -1
+        get() {
+            if (!isInitialised) init(); return field
+        }
 
-    val width: Int
-    val height: Int
+    var width: Int = 0
+        get() {
+            if (!isInitialised) init(); return field
+        }
+    var height: Int = 0
+        get() {
+            if (!isInitialised) init(); return field
+        }
 
-    init {
+    var isInitialised = false
+
+    private fun init() {
+        isInitialised = true
         val decoder = try {
             PNGDecoder(this::class.java.getResourceAsStream(location))
         } catch (e: IOException) {

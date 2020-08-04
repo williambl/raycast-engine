@@ -1,18 +1,14 @@
 package com.williambl.raycastengine.gameobject
 
-import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.render.Renderable
 import com.williambl.raycastengine.render.RenderingContext
 import com.williambl.raycastengine.render.SpriteRenderer
-import com.williambl.raycastengine.render.Texture
-import com.williambl.raycastengine.util.network.getObjectFromJson
-import com.williambl.raycastengine.util.network.readJson
-import com.williambl.raycastengine.util.network.writeObjectToJson
+import com.williambl.raycastengine.util.network.readString
 import com.williambl.raycastengine.util.network.writeString
 import io.netty.buffer.ByteBuf
 
-open class Sprite(var texture: Texture = Texture(""), x: Double = 0.0, y: Double = 0.0) : GameObject(x, y), Renderable<Sprite> {
-    val renderer: SpriteRenderer = SpriteRenderer()
+open class Sprite(var textureLoc: String = "", x: Double = 0.0, y: Double = 0.0) : GameObject(x, y), Renderable<Sprite> {
+    val renderer: SpriteRenderer by lazy { SpriteRenderer(textureLoc) }
 
     override fun getRenderer(): (Sprite, RenderingContext) -> Unit {
         return renderer::render
@@ -20,12 +16,12 @@ open class Sprite(var texture: Texture = Texture(""), x: Double = 0.0, y: Double
 
     override fun toBytes(byteBuf: ByteBuf) {
         super.toBytes(byteBuf)
-        byteBuf.writeString(writeObjectToJson(Texture::class.java, texture.location).toJsonString())
+        byteBuf.writeString(textureLoc)
     }
 
     override fun fromBytes(byteBuf: ByteBuf) {
         super.fromBytes(byteBuf)
-        texture = getObjectFromJson(byteBuf.readJson() as JsonObject) as Texture
+        textureLoc = byteBuf.readString()
     }
 
 }

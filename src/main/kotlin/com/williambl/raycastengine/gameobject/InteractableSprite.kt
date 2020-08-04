@@ -1,14 +1,13 @@
 package com.williambl.raycastengine.gameobject
 
 import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
-import com.williambl.raycastengine.render.Texture
 import com.williambl.raycastengine.util.network.readGameObject
 import com.williambl.raycastengine.util.network.writeGameObject
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import io.netty.buffer.Unpooled
 import java.nio.charset.Charset
 
-class InteractableSprite(texture: Texture = Texture(""), x: Double = 0.0, y: Double = 0.0) : Sprite(texture, x, y), Interactable, Collidable {
+class InteractableSprite(textureLoc: String = "", x: Double = 0.0, y: Double = 0.0) : Sprite(textureLoc, x, y), Interactable, Collidable {
     override fun interact(player: Player, raytraceResult: RaytraceResult<*>) {
         val buf = Unpooled.buffer()
         buf.writeGameObject(this)
