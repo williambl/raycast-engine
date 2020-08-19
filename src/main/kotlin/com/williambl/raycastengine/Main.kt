@@ -68,7 +68,7 @@ object Main {
 
     var startupListeners: ArrayList<StartupListener> = arrayListOf()
 
-    val queuedWork: Queue<Runnable> = ConcurrentLinkedQueue<Runnable>()
+    val queuedWork: Queue<Runnable> = ConcurrentLinkedQueue()
 
     val myId: UUID = UUID.randomUUID()
 

@@ -1,9 +1,11 @@
 package com.williambl.raycastengine.render
 
-import de.matthiasmann.twl.utils.PNGDecoder
+import com.williambl.raycastengine.util.freeMemoryManaged
+import com.williambl.raycastengine.util.toByteBuffer
+import com.williambl.raycastengine.util.toMemoryManaged
 import org.lwjgl.opengl.GL45.*
+import org.lwjgl.stb.STBImage
 import java.io.IOException
-import java.nio.ByteBuffer
 
 
 class Texture(val location: String) {
@@ -26,38 +28,39 @@ class Texture(val location: String) {
 
     private fun init() {
         isInitialised = true
-        val decoder = try {
-            PNGDecoder(this::class.java.getResourceAsStream(location))
+
+        val imageData = try {
+            this::class.java.getResourceAsStream(location).toByteBuffer().toMemoryManaged()
         } catch (e: IOException) {
-            println("\"$location\" is not a valid texture, skipping")
-            null
-        } catch (e: NullPointerException) {
-            println("\"$location\" is not a valid texture, skipping")
-            null
+            println("\"$location\" is not a valid texture.")
+            return
         }
 
-        if (decoder != null) {
-            width = decoder.width
-            height = decoder.height
+        val widthBuffer = IntArray(1)
+        val heightBuffer = IntArray(1)
+        val channelsBuffer = IntArray(1)
 
-            val buffer = ByteBuffer.allocateDirect(4 * width * height)
-            decoder.decode(buffer, width * 4, PNGDecoder.Format.RGBA)
-            buffer.flip()
+        val texture = STBImage.stbi_load_from_memory(imageData, widthBuffer, heightBuffer, channelsBuffer, 4)
 
-            id = glGenTextures()
+        imageData.freeMemoryManaged()
 
-            glBindTexture(GL_TEXTURE_2D, id)
-
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
-        } else {
-            id = -1
-            width = -1
-            height = -1
+        if (texture == null) {
+            println("\"$location\" is not a valid texture: ${STBImage.stbi_failure_reason()}")
+            return
         }
+
+        width = widthBuffer.first()
+        height = heightBuffer.first()
+
+        id = glGenTextures()
+
+        glBindTexture(GL_TEXTURE_2D, id)
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture)
     }
 
     fun bind() {

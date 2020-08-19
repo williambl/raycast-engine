@@ -50,8 +50,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile group: 'org.l33tlabs.twl', name: 'pngdecoder', version: '1.0'
-
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 
     compile group: 'io.netty', name: 'netty-all', version: '4.1.50.Final'
