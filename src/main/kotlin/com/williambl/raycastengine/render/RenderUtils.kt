@@ -4,6 +4,8 @@ import org.lwjgl.opengl.GL45.*
 
 object RenderUtils {
 
+    private val textures: MutableMap<String, Texture> = mutableMapOf()
+
     fun getAndCompileShaderProgram(shaderName: String): Int {
         return createCompleteShaderProgram(
                 this::class.java.getResource("/shaders/$shaderName/$shaderName.vert").readText(),
@@ -33,5 +35,9 @@ object RenderUtils {
         glAttachShader(shaderProgram, fragmentShader)
         glLinkProgram(shaderProgram)
         return shaderProgram
+    }
+
+    fun getOrCreateTexture(location: String): Texture {
+        return textures.getOrPut(location) { Texture(location) }
     }
 }

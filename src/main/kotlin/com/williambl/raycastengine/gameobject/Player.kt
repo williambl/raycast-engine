@@ -30,7 +30,7 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
 
     val worldRenderer: DefaultWorldRenderer by lazy { DefaultWorldRenderer(world as DefaultWorld, this) }
 
-    val renderer: PlayerRenderer = PlayerRenderer()
+    val renderer: PlayerRenderer by lazy { PlayerRenderer() }
 
     override fun tick() {
         if (id == Main.myId) {

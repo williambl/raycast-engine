@@ -6,7 +6,7 @@ class PlayerRenderer {
 
     lateinit var renderableShape: TexturedRenderableShape
 
-    val texture by lazy { Texture("/face.png") }
+    val texture = RenderUtils.getOrCreateTexture("/face.png")
 
     //TODO: work out why this renders a little off from certain directions
     fun render(player: Player, context: RenderingContext) {
