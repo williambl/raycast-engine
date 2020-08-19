@@ -9,6 +9,7 @@ import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
+import com.williambl.raycastengine.render.gui.Gui
 import com.williambl.raycastengine.util.SyncedProperty
 import com.williambl.raycastengine.util.network.readDoublePair
 import com.williambl.raycastengine.util.network.readString
@@ -16,6 +17,10 @@ import com.williambl.raycastengine.util.network.readUUID
 import com.williambl.raycastengine.util.network.writeString
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
+import imgui.ImGui
+import imgui.classes.Context
+import imgui.impl.gl.ImplGL3
+import imgui.impl.glfw.ImplGlfw
 import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.Unpooled
@@ -34,6 +39,7 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
 import org.reflections.Reflections
+import uno.glfw.GlfwWindow
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -51,6 +57,9 @@ object Main {
     var windowHeight: Int = 480
     var windowWidth: Int = 640
     var windowTitle: String = "Raycaster"
+
+    lateinit var implGlfw: ImplGlfw
+    lateinit var implGl3: ImplGL3
 
     val reflections = Reflections("")
 
@@ -93,6 +102,7 @@ object Main {
     private fun init(args: Array<String>) {
         initGLFW()
         initGL()
+        initImGui()
 
         //TODO: change this if client, only create world when ready to avoid that overwrite
         world = WorldLoader.load(args.getOrElse(0) { "/world.json" })
@@ -282,6 +292,13 @@ object Main {
         glClearColor(0.2f, 0.5f, 0.8f, 0.0f)
     }
 
+    private fun initImGui() {
+        val ctx = Context()
+        ImGui.styleColorsDark()
+        implGlfw = ImplGlfw(GlfwWindow.from(window), true)
+        implGl3 = ImplGL3()
+    }
+
     private fun initInputListeners() {
         inputListeners.forEach {
             it.attachInputCallbacks()
@@ -314,7 +331,14 @@ object Main {
         // invoked during this call.
         glfwPollEvents()
 
+        implGl3.newFrame()
+        implGlfw.newFrame()
+        ImGui.newFrame()
+
         tickRenderTickables()
+
+        ImGui.render()
+        implGl3.renderDrawData(ImGui.drawData!!)
 
         // Swap the color buffers
         glfwSwapBuffers(window)
