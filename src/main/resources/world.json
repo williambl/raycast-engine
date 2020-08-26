@@ -157,6 +157,14 @@
         2.0,
         true
       ]
+    },
+    {
+      "class": "com.williambl.raycastengine.gameobject.InteractableSprite",
+      "args": [
+        "/face.png",
+        3.0,
+        3.0
+      ]
     }
   ]
 }
