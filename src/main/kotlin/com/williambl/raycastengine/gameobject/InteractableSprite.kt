@@ -4,7 +4,7 @@ import com.beust.klaxon.JsonObject
 import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
 import com.williambl.raycastengine.render.gui.Gui
-import com.williambl.raycastengine.util.network.writeGameObject
+import com.williambl.raycastengine.util.network.toByteArray
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import imgui.ImGui
 import io.netty.buffer.Unpooled
@@ -14,14 +14,17 @@ class InteractableSprite(textureLoc: String = "", x: Double = 0.0, y: Double = 0
     val gui = MyGui()
 
     inner class MyGui : Gui {
-        var message = ""
+        var json = ""
+        var bytes = ""
         var shouldBeOpen = false
 
         override fun renderGui(): ImGui.() -> Any? = {
             if (shouldBeOpen) {
                 begin("Hi there!", ::shouldBeOpen)
                 text("As JSON, I am:")
-                textWrapped(message)
+                textWrapped(json)
+                text("And as bytes, I am:")
+                textWrapped(bytes)
                 end()
             }
         }
@@ -35,7 +38,10 @@ class InteractableSprite(textureLoc: String = "", x: Double = 0.0, y: Double = 0
         gui.shouldBeOpen = true
         val json = JsonObject()
         toJson(json)
-        gui.message = json.toJsonString(prettyPrint = true)
+        gui.json = json.toJsonString(prettyPrint = true)
+        val buf = Unpooled.buffer()
+        toBytes(buf)
+        gui.bytes = buf.toByteArray().map { it.toString(2) }.reduce { acc, s -> acc+s }
     }
 
     override fun getAABB() = AxisAlignedBoundingBox(x - 0.5, y - 0.5, x + 0.5, y + 0.5, this)
