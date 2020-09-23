@@ -7,8 +7,6 @@ import java.lang.reflect.Constructor
  * Creates a new object from the classname and arguments.
  */
 fun createObject(className: String, vararg args: Any): Any? {
-    println(className)
-    Class.forName(className).constructors.forEach { println(); it.parameterTypes.forEach { clazz -> println(clazz.canonicalName) } }
     return if (className == "") null else getConstructor(Class.forName(className), *args).newInstance(*args)
 }
 
