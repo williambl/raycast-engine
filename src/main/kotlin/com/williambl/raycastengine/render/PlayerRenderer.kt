@@ -22,7 +22,7 @@ class PlayerRenderer {
                             0, 1, 2,
                             2, 3, 0
                     ),
-                    RenderUtils.getAndCompileShaderProgram("flatTextured"),
+                    RenderUtils.getOrCreateShaderProgram("flatTextured"),
                     texture
             )
         }

@@ -112,7 +112,7 @@ object Main {
         initStartupListeners()
 
         if (args.contains("--client"))
-            initClient(8080, args.getOrElse(args.indexOf("--address") + 1) { "localhost" })
+            initClient(8080, /*args.getOrElse(args.indexOf("--address") + 1) {*/ "localhost" /*}*/)
         else
             initServer(8080)
     }

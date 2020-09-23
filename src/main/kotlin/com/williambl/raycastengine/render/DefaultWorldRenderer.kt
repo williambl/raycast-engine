@@ -23,7 +23,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
 
     val wallShapes: MutableList<TexturedRenderableShape> = mutableListOf()
 
-    var wallShader: Int = 0
+    lateinit var wallShader: ShaderProgram
 
     init {
         setupGL()
@@ -45,7 +45,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
                         0, 1, 2,
                         2, 3, 0
                 ),
-                RenderUtils.getAndCompileShaderProgram("flat")
+                RenderUtils.getOrCreateShaderProgram("flat")
         )
         floorShape.setup()
         skyShape = ColouredRenderableShape(
@@ -59,11 +59,11 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
                         0, 1, 2,
                         2, 3, 0
                 ),
-                RenderUtils.getAndCompileShaderProgram("flat")
+                RenderUtils.getOrCreateShaderProgram("flat")
         )
         skyShape.setup()
 
-        wallShader = RenderUtils.getAndCompileShaderProgram("flatTextured")
+        wallShader = RenderUtils.getOrCreateShaderProgram("flatTextured")
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {

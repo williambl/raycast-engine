@@ -2,7 +2,7 @@ package com.williambl.raycastengine.render
 
 import org.lwjgl.opengl.GL45.*
 
-class ColouredRenderableShape(val vertices: FloatArray, val indices: IntArray, val shaderProgram: Int): RenderableShape {
+class ColouredRenderableShape(val vertices: FloatArray, val indices: IntArray, val shaderProgram: ShaderProgram): RenderableShape {
 
     val vbo: IntArray = intArrayOf(1)
     val vao: IntArray = intArrayOf(1)
@@ -32,7 +32,7 @@ class ColouredRenderableShape(val vertices: FloatArray, val indices: IntArray, v
     }
 
     override fun render() {
-        glUseProgram(shaderProgram)
+        shaderProgram.use()
         glBindVertexArray(vao[0])
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
         glBindVertexArray(0)

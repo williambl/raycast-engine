@@ -2,7 +2,7 @@ package com.williambl.raycastengine.render
 
 import org.lwjgl.opengl.GL45.*
 
-class TexturedRenderableShape(var vertices: FloatArray, var indices: IntArray, val shaderProgram: Int, var texture: Texture): RenderableShape {
+class TexturedRenderableShape(var vertices: FloatArray, var indices: IntArray, val shaderProgram: ShaderProgram, var texture: Texture): RenderableShape {
 
     val vbo: IntArray = intArrayOf(1)
     val vao: IntArray = intArrayOf(1)
@@ -44,7 +44,7 @@ class TexturedRenderableShape(var vertices: FloatArray, var indices: IntArray, v
     }
 
     override fun render() {
-        glUseProgram(shaderProgram)
+        shaderProgram.use()
         texture.bind()
         glBindVertexArray(vao[0])
         glDrawElements(GL_TRIANGLES, indices.size, GL_UNSIGNED_INT, 0)
