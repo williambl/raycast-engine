@@ -9,7 +9,6 @@ import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
-import com.williambl.raycastengine.render.gui.Gui
 import com.williambl.raycastengine.util.SyncedProperty
 import com.williambl.raycastengine.util.network.readDoublePair
 import com.williambl.raycastengine.util.network.readString

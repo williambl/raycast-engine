@@ -13,7 +13,7 @@ class InteractableSprite(textureLoc: String = "", x: Double = 0.0, y: Double = 0
 
     val gui = MyGui()
 
-    inner class MyGui : Gui {
+    class MyGui : Gui {
         var json = ""
         var bytes = ""
         var shouldBeOpen = false

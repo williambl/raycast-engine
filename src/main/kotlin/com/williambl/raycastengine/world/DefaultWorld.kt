@@ -23,8 +23,8 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
     private val gameObjectsMutex = Any()
 
-    val gameObjectsToAdd = mutableListOf<GameObject>()
-    val gameObjectsToRemove = mutableListOf<GameObject>()
+    private val gameObjectsToAdd = mutableListOf<GameObject>()
+    private val gameObjectsToRemove = mutableListOf<GameObject>()
 
     var floorColor = Triple(0.0f, 0.0f, 0.0f)
     var skyColor = Triple(1.0f, 1.0f, 1.0f)

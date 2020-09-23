@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 fun <T> synced(initialValue: T, ownerIdProp: KProperty<UUID>, toBytes: (ByteBuf, T) -> ByteBuf, fromBytes: (ByteBuf) -> T): ReadWriteProperty<Any?, T> =
         SyncedProperty(initialValue, ownerIdProp, toBytes, fromBytes)
 
-class SyncedProperty<T>(private val initialValue: T, private val ownerIdProp: KProperty<UUID>, private val toBytes: (ByteBuf, T) -> ByteBuf, private val fromBytes: (ByteBuf) -> T) : ObservableProperty<T>(initialValue) {
+class SyncedProperty<T>(initialValue: T, private val ownerIdProp: KProperty<UUID>, private val toBytes: (ByteBuf, T) -> ByteBuf, private val fromBytes: (ByteBuf) -> T) : ObservableProperty<T>(initialValue) {
     override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
         if (!Main.world.isClient) {
             val buf = Unpooled.buffer()

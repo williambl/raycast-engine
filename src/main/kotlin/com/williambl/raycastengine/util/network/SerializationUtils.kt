@@ -24,7 +24,7 @@ fun getObjectFromJson(jsonObject: JsonObject): Any? {
 
 fun getConstructor(clazz: Class<*>, vararg args: Any): Constructor<*> {
     val argTypes = args.map { it::class.javaObjectType }.toTypedArray()
-    return clazz.declaredConstructors.firstOrNull { it.parameterTypes!!.map { type -> type.kotlin.javaObjectType }.toTypedArray().contentEquals(argTypes) }
+    return clazz.declaredConstructors.firstOrNull { it.parameterTypes.map { type -> type.kotlin.javaObjectType }.toTypedArray().contentEquals(argTypes) }
             ?: throw NoSuchMethodException("${clazz.name}: ${argTypes.joinToString(" ") { it.name }}")
 }
 
