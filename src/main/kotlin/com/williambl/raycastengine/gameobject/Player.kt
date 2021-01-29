@@ -46,9 +46,8 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
             if (Main.inputManager.isPressed("interact")) {
                 if (world.isClient) {
                     ClientNetworkManager.sendPacketToServer("interact", Unpooled.buffer())
-                } else {
-                    interact()
                 }
+                interact()
             }
 
             if (world.isClient) {
@@ -102,9 +101,10 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     val raytraceMode = RaytraceModeType.AABBS.and(RaytraceModeType.TILES)
 
     fun interact() {
-        if (world.isClient) {
+        if (this.id == Main.myId) {
             worldRenderer.shootTicks = 40
-        } else {
+        }
+        if (!world.isClient) {
             val result = world.rayTrace(dir.first, dir.second, x, y, raytraceMode)
             when (result.result) {
                 is RaytraceResult.AABBRaytraceResultType -> result.result.result
