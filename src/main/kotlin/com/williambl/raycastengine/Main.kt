@@ -104,7 +104,7 @@ object Main {
         initImGui()
 
         //TODO: change this if client, only create world when ready to avoid that overwrite
-        world = WorldLoader.load(args.getOrElse(0) { "/world.json" })
+        world = WorldLoader.load(args.getOrElse(0) { "/taterworld.json" })
         tickables.add(world)
         startupListeners.add(world)
         initInputListeners()
