@@ -20,6 +20,9 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
 
     lateinit var floorShape: ColouredRenderableShape
     lateinit var skyShape: ColouredRenderableShape
+    lateinit var gunShape: TexturedRenderableShape
+
+    val gunTextures = listOf(Texture("/gun0.png"), Texture("/gun1.png"))
 
     val wallShapes: MutableList<TexturedRenderableShape> = mutableListOf()
 
@@ -63,6 +66,22 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
         )
         skyShape.setup()
 
+        gunShape = TexturedRenderableShape(
+            floatArrayOf(
+                -0.75f, -1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                -0.75f, -0.25f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.75f, -0.25f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+                0.75f, -1f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+            ),
+            intArrayOf(
+                0, 1, 2,
+                2, 3, 0
+            ),
+            RenderUtils.getOrCreateShaderProgram("flatTextured"),
+            gunTextures[0]
+        )
+        gunShape.setup()
+
         wallShader = RenderUtils.getOrCreateShaderProgram("flatTextured")
     }
 
@@ -82,6 +101,8 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
         renderWorld(context)
 
         renderRenderables(context)
+
+        gunShape.render()
     }
 
     private fun renderBackground(context: RenderingContext) {
