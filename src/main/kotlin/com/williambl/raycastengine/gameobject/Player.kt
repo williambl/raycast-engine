@@ -16,6 +16,7 @@ import com.williambl.raycastengine.world.DefaultWorld
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
 
 
@@ -101,7 +102,11 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
             is RaytraceResult.AABBRaytraceResultType -> result.result.result
             is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(result.x.toDouble() + 0.5, result.y.toDouble() + 0.5)
             else -> listOf()
-        }.filter { it.owner is Interactable }.forEach { (it.owner as Interactable).interact(this, result) }
+        }.filter { it.owner is Interactable }.filter {
+            val owner = (it.owner as GameObject)
+            (owner.x - x).pow(2) + (owner.y - y).pow(2) < 20
+        }.forEach { (it.owner as Interactable).interact(this, result) }
+        worldRenderer.shootTicks = 40
     }
 
     override fun getRenderer(): (Player, RenderingContext) -> Unit {

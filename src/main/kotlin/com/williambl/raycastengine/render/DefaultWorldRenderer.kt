@@ -24,6 +24,8 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
 
     val gunTextures = listOf(Texture("/gun0.png"), Texture("/gun1.png"))
 
+    var shootTicks = 0
+
     val wallShapes: MutableList<TexturedRenderableShape> = mutableListOf()
 
     lateinit var wallShader: ShaderProgram
@@ -34,6 +36,13 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
 
     override fun renderTick() {
         render(world, camera)
+
+        if (shootTicks > 0) {
+            gunShape.texture = gunTextures[1]
+            shootTicks--
+        } else {
+            gunShape.texture = gunTextures[0]
+        }
     }
 
     private fun setupGL() {
