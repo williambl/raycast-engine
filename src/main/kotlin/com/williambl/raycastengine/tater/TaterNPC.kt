@@ -40,8 +40,8 @@ class TaterNPC(textureLoc: String = "", private var deadTextureLoc: String = "",
     override fun tick() {
         if (deadTicks >= 0) {
             deadTicks++
-            //if (deadTicks > 20)
-                //this.world.removeGameObject(this)
+            if (deadTicks > 120)
+                this.world.removeGameObject(this)
         } else {
             val tryX = x + (Random.nextFloat()-0.5f) * 0.1f
             if (world.isTileAir(tryX.roundToInt(), y.roundToInt())) {
