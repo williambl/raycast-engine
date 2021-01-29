@@ -43,8 +43,13 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
                 left()
             if (Main.inputManager.isPressed("right"))
                 right()
-            if (Main.inputManager.isPressed("interact"))
-                interact()
+            if (Main.inputManager.isPressed("interact")) {
+                if (world.isClient) {
+                    ClientNetworkManager.sendPacketToServer("interact", Unpooled.buffer())
+                } else {
+                    interact()
+                }
+            }
 
             if (world.isClient) {
                 ClientNetworkManager.sendPacketToServer("move", Unpooled.buffer().writeDouble(x).writeDouble(y).writeDoublePair(dir).writeDoublePair(plane))
@@ -96,17 +101,23 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
 
     val raytraceMode = RaytraceModeType.AABBS.and(RaytraceModeType.TILES)
 
-    private fun interact() {
-        val result = world.rayTrace(dir.first, dir.second, x, y, raytraceMode)
-        when (result.result) {
-            is RaytraceResult.AABBRaytraceResultType -> result.result.result
-            is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(result.x.toDouble() + 0.5, result.y.toDouble() + 0.5)
-            else -> listOf()
-        }.filter { it.owner is Interactable }.filter {
-            val owner = (it.owner as GameObject)
-            (owner.x - x).pow(2) + (owner.y - y).pow(2) < 20
-        }.forEach { (it.owner as Interactable).interact(this, result) }
-        worldRenderer.shootTicks = 40
+    fun interact() {
+        if (world.isClient) {
+            worldRenderer.shootTicks = 40
+        } else {
+            val result = world.rayTrace(dir.first, dir.second, x, y, raytraceMode)
+            when (result.result) {
+                is RaytraceResult.AABBRaytraceResultType -> result.result.result
+                is RaytraceResult.TileRaytraceResultType -> (world as DefaultWorld).getAABBsAt(
+                    result.x.toDouble() + 0.5,
+                    result.y.toDouble() + 0.5
+                )
+                else -> listOf()
+            }.filter { it.owner is Interactable }.filter {
+                val owner = (it.owner as GameObject)
+                (owner.x - x).pow(2) + (owner.y - y).pow(2) < 20
+            }.forEach { (it.owner as Interactable).interact(this, result) }
+        }
     }
 
     override fun getRenderer(): (Player, RenderingContext) -> Unit {

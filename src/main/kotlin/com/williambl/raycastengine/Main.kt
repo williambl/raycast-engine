@@ -146,6 +146,12 @@ object Main {
             player.dir = buf.readDoublePair()
             player.plane = buf.readDoublePair()
         }
+        ServerNetworkManager.addPacketCallback("interact") { packet ->
+            val id = packet.getId()
+            val player = world.getGameObjectsOfType(Player::class.java).firstOrNull { it.id == id }
+                ?: return@addPacketCallback
+            player.interact()
+        }
         thread(name = "Server Network Thread") {
             val bossGroup = NioEventLoopGroup()
             val workerGroup = NioEventLoopGroup()
