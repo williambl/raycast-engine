@@ -10,7 +10,7 @@ class TaterSpawner : GameObject(0.0, 0.0), Tickable {
     override fun tick() {
         timer++
         if (timer % 60 == 0) {
-            world.addGameObject(TaterNPC("/tater.png", "/irritater.png", Random.nextDouble(2.0, 8.0), Random.nextDouble(2.0, 8.0)))
+            world.addGameObject(TaterNPC("/tater.png", "/friedtater.png", Random.nextDouble(2.0, 8.0), Random.nextDouble(2.0, 8.0)))
         }
     }
 }
