@@ -2,6 +2,9 @@ package com.williambl.raycastengine.util.math
 
 import kotlin.math.sqrt
 
+/**
+ * An immutable 2-dimensional double-precision vector.
+ */
 class Vec2d(val x: Double, val y: Double) {
 
     fun normalised(): Vec2d {
