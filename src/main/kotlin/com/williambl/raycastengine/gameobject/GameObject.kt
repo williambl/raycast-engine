@@ -26,31 +26,64 @@ import java.util.*
  */
 open class GameObject(xIn: Double = 0.0, yIn: Double = 0.0) {
 
+    /**
+     * The x coordinate of the GameObject. Synced.
+     */
     var x: Double by synced(xIn, ::id, ByteBuf::writeDouble, ByteBuf::readDouble)
+
+    /**
+     * The y coordinate of the GameObject. Synced.
+     */
     var y: Double by synced(yIn, ::id, ByteBuf::writeDouble, ByteBuf::readDouble)
 
+    /**
+     * The world this GameObject belongs to.
+     */
     lateinit var world: World
 
+    /**
+     * This GameObject's UUID, which can be used to uniquely identify it, even across different clients.
+     */
     open var id: UUID = UUID.randomUUID()
 
+    /**
+     * Serialise the GameObject to bytes.
+     *
+     * The data must be stored in the same order it's read in [fromBytes]
+     */
     open fun toBytes(byteBuf: ByteBuf) {
         byteBuf.writeUUID(id)
         byteBuf.writeDouble(x)
         byteBuf.writeDouble(y)
     }
 
+    /**
+     * Deserialise the GameObject from bytes.
+     *
+     * The data must be read back in the same order it's written in [toBytes]
+     */
     open fun fromBytes(byteBuf: ByteBuf) {
         id = byteBuf.readUUID()
         x = byteBuf.readDouble()
         y = byteBuf.readDouble()
     }
 
+    /**
+     * Serialise the GameObject to JSON.
+     *
+     * This is currently not used for anything; it may be used in future for a level editor.
+     */
     open fun toJson(json: JsonObject) {
         json["id"] = id.toString()
         json["x"] = x
         json["y"] = y
     }
 
+    /**
+     * Deserialise an object from JSON.
+     *
+     * This can be used in world files where `data` is used to specify GameObject data rather than `args`.
+     */
     open fun fromJson(json: JsonObject) {
         id = UUID.fromString(json["uuid"].toString())
         x = json["x"] as Double
