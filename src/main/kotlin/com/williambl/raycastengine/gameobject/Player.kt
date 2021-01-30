@@ -42,8 +42,11 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
                 left()
             if (Main.inputManager.isPressed("right"))
                 right()
-            if (Main.inputManager.isPressed("interact"))
+            if (Main.inputManager.isPressed("interact")) {
+                if (world.isClient)
+                    ClientNetworkManager.sendPacketToServer("interact", Unpooled.buffer())
                 interact()
+            }
 
             if (world.isClient) {
                 ClientNetworkManager.sendPacketToServer("move", Unpooled.buffer().writeDouble(x).writeDouble(y).writeDoublePair(dir).writeDoublePair(plane))
@@ -95,7 +98,7 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
 
     val raytraceMode = RaytraceModeType.AABBS.and(RaytraceModeType.TILES)
 
-    private fun interact() {
+    fun interact() {
         val result = world.rayTrace(dir.first, dir.second, x, y, raytraceMode)
         when (result.result) {
             is RaytraceResult.AABBRaytraceResultType -> result.result.result

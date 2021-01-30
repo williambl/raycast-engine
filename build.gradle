@@ -27,6 +27,7 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.10' //unfortunately cannot use $kotlin_version for this
+    id 'org.jetbrains.dokka' version '1.4.20'
     id 'application'
 }
 
@@ -109,5 +110,4 @@ compileKotlin {
         freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
     }
 }
-
 
