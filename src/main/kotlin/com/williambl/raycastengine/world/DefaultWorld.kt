@@ -49,10 +49,6 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
                 it.tick()
         }
 
-        if (!this.isClient && Random.nextFloat() < 0.01) addGameObject(Sprite("/face.png", Random.nextDouble(1.0,
-            map.size.toDouble()
-        ), Random.nextDouble(1.0, map[0].size.toDouble())))
-
         updateGameObjectLists()
     }
 
