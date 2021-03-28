@@ -8,11 +8,16 @@ import com.williambl.raycastengine.collision.CollisionProvider
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
+import com.williambl.raycastengine.gameobject.Sprite
+import com.williambl.raycastengine.network.NetworkManager
+import com.williambl.raycastengine.network.ServerNetworkManager
 import com.williambl.raycastengine.render.RenderUtils
 import com.williambl.raycastengine.render.Texture
 import com.williambl.raycastengine.util.network.*
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.util.*
+import kotlin.random.Random
 
 
 class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider {
@@ -44,6 +49,10 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
                 it.tick()
         }
 
+        if (!this.isClient && Random.nextFloat() < 0.01) addGameObject(Sprite("/face.png", Random.nextDouble(1.0,
+            map.size.toDouble()
+        ), Random.nextDouble(1.0, map[0].size.toDouble())))
+
         updateGameObjectLists()
     }
 
@@ -72,6 +81,14 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
 
     fun updateGameObjectLists() {
         synchronized(gameObjectsMutex) {
+            if (!this.isClient) {
+                gameObjectsToAdd.map { Unpooled.buffer().writeGameObject(it) }.forEach { buf ->
+                    ServerNetworkManager.sendPacketToAll("addGameObject", buf)
+                }
+                gameObjectsToRemove.map { Unpooled.buffer().writeUUID(it.id) }.forEach { buf ->
+                    ServerNetworkManager.sendPacketToAll("removeGameObject", buf)
+                }
+            }
             gameObjects.addAll(gameObjectsToAdd)
             gameObjectsToAdd.clear()
 

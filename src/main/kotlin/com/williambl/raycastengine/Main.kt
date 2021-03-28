@@ -10,10 +10,7 @@ import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
 import com.williambl.raycastengine.util.SyncedProperty
-import com.williambl.raycastengine.util.network.readDoublePair
-import com.williambl.raycastengine.util.network.readString
-import com.williambl.raycastengine.util.network.readUUID
-import com.williambl.raycastengine.util.network.writeString
+import com.williambl.raycastengine.util.network.*
 import com.williambl.raycastengine.world.World
 import com.williambl.raycastengine.world.WorldLoader
 import imgui.ImGui
@@ -212,6 +209,19 @@ object Main {
                 buf.release()
             })
         }
+        ClientNetworkManager.addPacketCallback("addGameObject") { packet ->
+            val buf = packet.buf.copy()
+            queuedWork.offer {
+                world.addGameObject(buf.readGameObject())
+            }
+        }
+        ClientNetworkManager.addPacketCallback("removeGameObject") { packet ->
+            val uuid = packet.buf.readUUID()
+            queuedWork.offer {
+                world.removeGameObject(world.getGameObjects().find { it.id == uuid } ?: return@offer)
+            }
+        }
+
         thread(name = "Client Network Thread") {
             val workerGroup = NioEventLoopGroup()
             try {
