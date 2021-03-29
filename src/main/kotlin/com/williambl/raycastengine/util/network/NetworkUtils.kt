@@ -117,43 +117,89 @@ fun ByteBuf.readFloatTriple(): Triple<Float, Float, Float> = Triple(readFloat(),
  */
 fun ByteBuf.writeJson(json: JsonBase) = writeString(json.toJsonString())
 
+/**
+ * Reads a JSON Object from the buffer
+ */
 fun ByteBuf.readJson(): Any = Parser.default().parse(readString().reader())
 
+/**
+ * Writes [Any object][Any]'s class and constructor args to the buffer.
+ *
+ * @param klass the [Class] of the object
+ * @param args the constructor arguments to be used to create the object
+ *
+ * @throws [IllegalArgumentException] if any of [args] are not JSON-representable
+ *
+ * @see writeObjectToJson
+ * @see readObject
+ */
 fun ByteBuf.writeObject(klass: Class<*>?, vararg args: Any?): ByteBuf {
     writeJson(writeObjectToJson(klass, args))
     return this
 }
 
+/**
+ * Creates any object from the buffer.
+ *
+ * @see getObjectFromJson
+ * @see writeObject
+ */
 fun ByteBuf.readObject(): Any? {
     return getObjectFromJson(readJson() as JsonObject)
 }
 
+/**
+ * Writes a [GameObject] to the buffer.
+ *
+ * The class name is written first, followed by the result of gameobject's [GameObject.toBytes].
+ *
+ * @see readGameObject
+ */
 fun ByteBuf.writeGameObject(gameObject: GameObject): ByteBuf {
     writeString(gameObject::class.java.canonicalName)
     gameObject.toBytes(this)
     return this
 }
 
+/**
+ * Reads a [GameObject] from the buffer.
+ *
+ * The class name is read, the zero-param constructor is called, and then [GameObject.fromBytes] is called.
+ *
+ * @see writeGameObject
+ */
 fun ByteBuf.readGameObject(): GameObject {
     val gameObject = Class.forName(readString()).constructors.first { it.parameterCount == 0 }.newInstance() as GameObject
     gameObject.fromBytes(this)
     return gameObject
 }
 
+/**
+ * Writes an [IntArray] to the buffer.
+ */
 fun ByteBuf.writeIntArray(array: IntArray) {
     writeInt(array.size)
     array.forEach { writeInt(it) }
 }
 
+/**
+ * Reads an [IntArray] from the buffer.
+ */
 fun ByteBuf.readIntArray(): IntArray {
     return IntArray(readInt()) { readInt() }
 }
 
+/**
+ * Writes a 2-dimensional int array to the buffer.
+ */
 fun ByteBuf.write2DIntArray(array: Array<IntArray>) {
     writeInt(array.size)
     array.forEach { writeIntArray(it) }
 }
 
+/**
+ * Reads a 2-dimensional int array from the buffer.
+ */
 fun ByteBuf.read2DIntArray(): Array<IntArray> {
     return Array(readInt()) { readIntArray() }
 }
