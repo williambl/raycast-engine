@@ -7,7 +7,13 @@ import org.lwjgl.opengl.GL45.*
 import org.lwjgl.stb.STBImage
 import java.io.IOException
 
-
+/**
+ * A representation of a texture.
+ *
+ * The texture is loaded from the jar resource at [location], from any format supported by [STBImage].
+ *
+ * Do not call the constructor, use [RenderUtils.getOrCreateTexture] instead.
+ */
 class Texture(val location: String) {
 
     private var id: Int = -1

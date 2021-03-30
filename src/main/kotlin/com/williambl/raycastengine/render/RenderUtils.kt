@@ -7,6 +7,17 @@ object RenderUtils {
     private val textures: MutableMap<String, Texture> = mutableMapOf()
     private val shaders: MutableMap<String, ShaderProgram> = mutableMapOf()
 
+    /**
+     * Loads a [ShaderProgram] from a resource named [shaderName].
+     *
+     * Shader programs are in the following format:
+     * ```
+     * shaders
+     * ├── shaderName
+     * │   ├── shaderName.frag
+     * │   └── shaderName.vert
+     * ```
+     */
     fun getOrCreateShaderProgram(shaderName: String): ShaderProgram {
         return shaders.getOrPut(shaderName) {
             createCompleteShaderProgram(
@@ -16,6 +27,11 @@ object RenderUtils {
         )}
     }
 
+    /**
+     * Loads a [Texture] from the jar resource at [location].
+     *
+     * The texture file can be in any format supported by [org.lwjgl.stb.STBImage].
+     */
     fun getOrCreateTexture(location: String): Texture {
         return textures.getOrPut(location) { Texture(location) }
     }
