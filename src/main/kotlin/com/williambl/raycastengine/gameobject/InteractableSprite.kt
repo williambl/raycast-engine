@@ -1,9 +1,8 @@
 package com.williambl.raycastengine.gameobject
 
 import com.beust.klaxon.JsonObject
-import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.collision.AxisAlignedBoundingBox
-import com.williambl.raycastengine.render.RenderUtils
+import com.williambl.raycastengine.render.RenderSystem
 import com.williambl.raycastengine.render.gui.Gui
 import com.williambl.raycastengine.util.network.toByteArray
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
@@ -32,7 +31,7 @@ class InteractableSprite(textureLoc: String = "", x: Double = 0.0, y: Double = 0
     }
 
     init {
-        RenderUtils.addRenderTickable(gui)
+        RenderSystem.addRenderTickable(gui)
     }
 
     override fun interact(player: Player, raytraceResult: RaytraceResult<*>) {

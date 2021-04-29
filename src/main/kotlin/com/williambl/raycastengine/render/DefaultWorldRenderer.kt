@@ -45,7 +45,7 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
                         0, 1, 2,
                         2, 3, 0
                 ),
-                RenderUtils.getOrCreateShaderProgram("flat")
+                RenderSystem.getOrCreateShaderProgram("flat")
         )
         floorShape.setup()
         skyShape = ColouredRenderableShape(
@@ -59,11 +59,11 @@ class DefaultWorldRenderer(val world: DefaultWorld, val camera: Camera) : Render
                         0, 1, 2,
                         2, 3, 0
                 ),
-                RenderUtils.getOrCreateShaderProgram("flat")
+                RenderSystem.getOrCreateShaderProgram("flat")
         )
         skyShape.setup()
 
-        wallShader = RenderUtils.getOrCreateShaderProgram("flatTextured")
+        wallShader = RenderSystem.getOrCreateShaderProgram("flatTextured")
     }
 
     private fun render(world: DefaultWorld, camera: Camera) {

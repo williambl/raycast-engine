@@ -12,7 +12,7 @@ import java.io.IOException
  *
  * The texture is loaded from the jar resource at [location], from any format supported by [STBImage].
  *
- * Do not call the constructor, use [RenderUtils.getOrCreateTexture] instead.
+ * Do not call the constructor, use [RenderSystem.getOrCreateTexture] instead.
  */
 class Texture(val location: String) {
 

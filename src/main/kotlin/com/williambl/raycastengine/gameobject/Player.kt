@@ -21,7 +21,7 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     init {
         if (isLocal) {
             id = Main.myId
-            RenderUtils.addRenderTickable(this)
+            RenderSystem.addRenderTickable(this)
         }
     }
 
@@ -113,12 +113,12 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     override fun fromJson(json: JsonObject) {
         super.fromJson(json)
         if (id == Main.myId)
-            RenderUtils.addRenderTickable(this)
+            RenderSystem.addRenderTickable(this)
     }
 
     override fun fromBytes(byteBuf: ByteBuf) {
         super.fromBytes(byteBuf)
         if (id == Main.myId)
-            RenderUtils.addRenderTickable(this)
+            RenderSystem.addRenderTickable(this)
     }
 }

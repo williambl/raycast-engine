@@ -4,7 +4,7 @@ import com.williambl.raycastengine.gameobject.Sprite
 
 class SpriteRenderer(textureLoc: String) {
 
-    val texture = RenderUtils.getOrCreateTexture(textureLoc)
+    val texture = RenderSystem.getOrCreateTexture(textureLoc)
     lateinit var renderableShape: TexturedRenderableShape
 
     //TODO: work out why this renders a little off from certain directions
@@ -21,7 +21,7 @@ class SpriteRenderer(textureLoc: String) {
                             0, 1, 2,
                             2, 3, 0
                     ),
-                    RenderUtils.getOrCreateShaderProgram("flatTextured"),
+                    RenderSystem.getOrCreateShaderProgram("flatTextured"),
                     texture
             )
         }

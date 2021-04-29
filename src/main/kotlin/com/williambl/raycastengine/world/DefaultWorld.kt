@@ -8,16 +8,13 @@ import com.williambl.raycastengine.collision.CollisionProvider
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.gameobject.Collidable
 import com.williambl.raycastengine.gameobject.GameObject
-import com.williambl.raycastengine.gameobject.Sprite
-import com.williambl.raycastengine.network.NetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
-import com.williambl.raycastengine.render.RenderUtils
+import com.williambl.raycastengine.render.RenderSystem
 import com.williambl.raycastengine.render.Texture
 import com.williambl.raycastengine.util.network.*
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.util.*
-import kotlin.random.Random
 
 
 class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider {
@@ -110,7 +107,7 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
             }
 
             world.wallTextures = json.array<String>("wallTextures")!!.map {
-                RenderUtils.getOrCreateTexture(it)
+                RenderSystem.getOrCreateTexture(it)
             }.toTypedArray()
 
             val gameObjects = json.array<JsonObject>("gameObjects")
@@ -137,7 +134,7 @@ class DefaultWorld(override val map: Array<IntArray>) : World, CollisionProvider
             world.floorColor = buf.readFloatTriple()
             world.skyColor = buf.readFloatTriple()
 
-            world.wallTextures = buf.readStrings().map { RenderUtils.getOrCreateTexture(it) }.toTypedArray()
+            world.wallTextures = buf.readStrings().map { RenderSystem.getOrCreateTexture(it) }.toTypedArray()
 
             for (i in 0 until buf.readInt()) {
                 world.addGameObject(buf.readGameObject())

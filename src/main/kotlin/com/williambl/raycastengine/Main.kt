@@ -9,7 +9,7 @@ import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
-import com.williambl.raycastengine.render.RenderUtils
+import com.williambl.raycastengine.render.RenderSystem
 import com.williambl.raycastengine.util.SyncedProperty
 import com.williambl.raycastengine.util.network.*
 import com.williambl.raycastengine.world.World
@@ -182,7 +182,7 @@ object Main {
                 tickables.remove(world)
                 startupListeners.remove(world)
                 world.getGameObjectsOfType(RenderTickable::class.java).forEach {
-                    RenderUtils.removeRenderTickable(it)
+                    RenderSystem.removeRenderTickable(it)
                 }
                 world = WorldLoader.getSerializer(buf.readString()).fromBytes(buf)
                 world.isClient = true
@@ -340,7 +340,7 @@ object Main {
         implGlfw.newFrame()
         ImGui.newFrame()
 
-        RenderUtils.tickRenderTickables()
+        RenderSystem.tickRenderTickables()
 
         ImGui.render()
         implGl3.renderDrawData(ImGui.drawData!!)
