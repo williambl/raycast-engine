@@ -5,10 +5,7 @@ import com.williambl.raycastengine.Main
 import com.williambl.raycastengine.events.RenderTickable
 import com.williambl.raycastengine.events.Tickable
 import com.williambl.raycastengine.network.ClientNetworkManager
-import com.williambl.raycastengine.render.DefaultWorldRenderer
-import com.williambl.raycastengine.render.PlayerRenderer
-import com.williambl.raycastengine.render.Renderable
-import com.williambl.raycastengine.render.RenderingContext
+import com.williambl.raycastengine.render.*
 import com.williambl.raycastengine.util.network.writeDoublePair
 import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
@@ -24,7 +21,7 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     init {
         if (isLocal) {
             id = Main.myId
-            Main.renderTickables.add(this)
+            RenderUtils.addRenderTickable(this)
         }
     }
 
@@ -116,12 +113,12 @@ class Player(x: Double = 0.0, y: Double = 0.0, isLocal: Boolean = false) : Camer
     override fun fromJson(json: JsonObject) {
         super.fromJson(json)
         if (id == Main.myId)
-            Main.renderTickables.add(this)
+            RenderUtils.addRenderTickable(this)
     }
 
     override fun fromBytes(byteBuf: ByteBuf) {
         super.fromBytes(byteBuf)
         if (id == Main.myId)
-            Main.renderTickables.add(this)
+            RenderUtils.addRenderTickable(this)
     }
 }

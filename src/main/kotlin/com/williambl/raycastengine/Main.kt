@@ -9,6 +9,7 @@ import com.williambl.raycastengine.gameobject.Player
 import com.williambl.raycastengine.input.InputManager
 import com.williambl.raycastengine.network.ClientNetworkManager
 import com.williambl.raycastengine.network.ServerNetworkManager
+import com.williambl.raycastengine.render.RenderUtils
 import com.williambl.raycastengine.util.SyncedProperty
 import com.williambl.raycastengine.util.network.*
 import com.williambl.raycastengine.world.World
@@ -64,8 +65,6 @@ object Main {
     var inputManager = InputManager()
 
     var tickables: ArrayList<Tickable> = arrayListOf()
-
-    var renderTickables = mutableListOf<RenderTickable>()
 
     var inputListeners: ArrayList<InputListener> = arrayListOf(
             inputManager
@@ -183,7 +182,7 @@ object Main {
                 tickables.remove(world)
                 startupListeners.remove(world)
                 world.getGameObjectsOfType(RenderTickable::class.java).forEach {
-                    renderTickables.remove(it)
+                    RenderUtils.removeRenderTickable(it)
                 }
                 world = WorldLoader.getSerializer(buf.readString()).fromBytes(buf)
                 world.isClient = true
@@ -329,12 +328,6 @@ object Main {
         }
     }
 
-    private fun tickRenderTickables() {
-        renderTickables.forEach {
-            it.renderTick()
-        }
-    }
-
     private fun renderLoop() {
         // Clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -347,7 +340,7 @@ object Main {
         implGlfw.newFrame()
         ImGui.newFrame()
 
-        tickRenderTickables()
+        RenderUtils.tickRenderTickables()
 
         ImGui.render()
         implGl3.renderDrawData(ImGui.drawData!!)
@@ -366,5 +359,4 @@ object Main {
         tickTickables()
         Thread.sleep(max(0, next - System.currentTimeMillis()))
     }
-
 }
