@@ -4,6 +4,9 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.williambl.raycastengine.Main
 
+/**
+ * The World Loader handles [World Serializers][WorldSerializer], and the loading of JSON-worlds from disk.
+ */
 object WorldLoader {
 
     val worldSerializerClasses: Map<String, Class<out WorldSerializer>> = Main.reflections.getSubTypesOf(WorldSerializer::class.java).map {

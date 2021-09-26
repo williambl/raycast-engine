@@ -47,7 +47,6 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
-//TODO: decouple ticks from frames
 object Main {
 
     var window: Long = 0

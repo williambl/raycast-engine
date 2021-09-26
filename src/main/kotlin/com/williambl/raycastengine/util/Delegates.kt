@@ -23,10 +23,23 @@ import kotlin.reflect.KProperty
  * @param ownerIdProp the property holding the UUID of the [GameObject][com.williambl.raycastengine.gameobject.GameObject] which owns this property.
  * @param toBytes a function used to serialise the property, used when syncing.
  * @param fromBytes a function used to deserialise the property, used when syncing.
+ *
+ * @see SyncedProperty
  */
 fun <T> synced(initialValue: T, ownerIdProp: KProperty<UUID>, toBytes: (ByteBuf, T) -> ByteBuf, fromBytes: (ByteBuf) -> T): ReadWriteProperty<Any?, T> =
         SyncedProperty(initialValue, ownerIdProp, toBytes, fromBytes)
 
+/**
+ * A property synced from server to client.
+ *
+ * @param T the type of the property.
+ * @param initialValue the initial value of the property.
+ * @property ownerIdProp the property holding the UUID of the [GameObject][com.williambl.raycastengine.gameobject.GameObject] which owns this property.
+ * @property toBytes a function used to serialise the property, used when syncing.
+ * @property fromBytes a function used to deserialise the property, used when syncing.
+ *
+ * @see synced
+ */
 class SyncedProperty<T>(initialValue: T, private val ownerIdProp: KProperty<UUID>, private val toBytes: (ByteBuf, T) -> ByteBuf, private val fromBytes: (ByteBuf) -> T) : ObservableProperty<T>(initialValue) {
     override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
         if (!Main.world.isClient) {

@@ -11,6 +11,16 @@ import com.williambl.raycastengine.util.raytrace.RaytraceModeType
 import com.williambl.raycastengine.util.raytrace.RaytraceResult
 import kotlin.math.abs
 
+/**
+ * The world, in which all things in the game take place.
+ *
+ * A World holds all the [GameObject]s in the game, and handles their ticking.
+ *
+ * It also handles all [raytracing][rayTrace], and holds the [map] of tiles.
+ *
+ * Worlds are created by the [WorldLoader] using a [WorldSerializer]. Implementors of World therefore require a custom
+ * [WorldSerializer] to create them.
+ */
 interface World: StartupListener, Tickable {
 
     val map: Array<IntArray>
